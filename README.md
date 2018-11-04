@@ -1,4 +1,4 @@
-# Cloud Kit
+# iCloud API
 
 This is an unofficial iCloud API that provides useful methods to interact with some services of iCloud.
 
@@ -22,7 +22,7 @@ npm install cloud-kit
 
 ```javascript
 // Require the module
-const iCloud = require('cloud-kit');
+const iCloud = require('icloud');
 
 var session = {}; // An empty session. Has to be a session object or file path that points on a JSON file containing your session
 var username = "my.account@mail.com"; // Your apple id
