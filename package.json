@@ -1,5 +1,5 @@
 {
-	"name": "cloud-kit",
+	"name": "apple-icloud",
 	"version": "1.0.0",
 	"description": "iCloud API",
 	"keywords": [
@@ -20,13 +20,13 @@
 		"friends",
 		"photos"
 	],
+	"license": "ISC",
+	"author": "Maurice Conrad",
+	"main": "main.js",
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/MauriceConrad/iCloud-API.git"
 	},
-	"license": "ISC",
-	"author": "Maurice Conrad",
-	"main": "main.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
