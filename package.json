@@ -1,0 +1,23 @@
+{
+	"name": "cloud-kit",
+	"version": "1.0.0",
+	"description": "iCloud API",
+	"keywords": [
+		"icloud",
+		"apple",
+		"cloud",
+		"cloudkit",
+		"api"
+	],
+	"license": "ISC",
+	"author": "Maurice Conrad",
+	"main": "main.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {
+		"cookie": "^0.3.1",
+		"prompt": "^1.0.0",
+		"request": "^2.83.0"
+	}
+}
