@@ -20,6 +20,10 @@
 		"friends",
 		"photos"
 	],
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/MauriceConrad/iCloud-API.git"
+	},
 	"license": "ISC",
 	"author": "Maurice Conrad",
 	"main": "main.js",
