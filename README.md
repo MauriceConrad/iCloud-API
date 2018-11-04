@@ -6,8 +6,6 @@ This is an unofficial iCloud API that provides useful methods to interact with s
 
 Please make sure that this API is my private work and therefore it will never be supported by Apple. iCloud's endpoints and functionality can be changed every time by Apple. Using this project is on your risk and it's possible that apple bans your account. They can do whatever they want and because of the fact that it doesn't fits in to Apples agreements, I can not ensure using this API without risks.
 
-The name **cloud-kit** is based on Apples [Cloud Kit](https://developer.apple.com/documentation/cloudkit) framework. This module is my private work and not a part of official apple services.
-
 The API's I've implemented are more less the same as Apple provides. Sometimes, the objects are simplified or a little bit restructured because the requirements of such a Javascript API are different from the original API Apple provides. But all in all it's Apple's data and I'm not the author of the idea how an API's result works in detail.
 
 I can not be sure that Apple does not provide any kind of changes in their API. That means, it is possible that something does not work as expected although you did it as it is described in the *Documentation* here.
@@ -15,14 +13,14 @@ I can not be sure that Apple does not provide any kind of changes in their API. 
 ## Installation
 
 ```bash
-npm install cloud-kit
+npm install apple-icloud
 ```
 
 ## Getting Started
 
 ```javascript
 // Require the module
-const iCloud = require('icloud');
+const iCloud = require('apple-icloud');
 
 var session = {}; // An empty session. Has to be a session object or file path that points on a JSON file containing your session
 var username = "my.account@mail.com"; // Your apple id
