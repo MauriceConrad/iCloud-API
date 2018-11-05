@@ -1,5 +1,5 @@
 const request = require('request');
-var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime} = require("./../helper");
+var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime, fillDefaults} = require("./../helper");
 
 module.exports = {
   getOpenTasks(callback = function() {}) {
@@ -16,10 +16,10 @@ module.exports = {
         "lang": self.clientSettings.language,
         "usertz": self.clientSettings.timezone
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies)
-        }.fillDefaults(self.clientSettings.defaultHeaders)
+        }, self.clientSettings.defaultHeaders)
       }, function(err, response, body) {
         if (err) {
           reject(err);
@@ -96,11 +96,11 @@ module.exports = {
         "methodOverride": methodOverride || "POST",
         "ifMatch": task.etag ? encodeURIComponent(task.etag) : ""
       }), {
-        headers:  {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        } ,self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) {
@@ -143,11 +143,11 @@ module.exports = {
         "usertz": self.clientSettings.timezone,
         "methodOverride": "PUT"
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) {
@@ -175,10 +175,10 @@ module.exports = {
         "lang": self.clientSettings.language,
         "usertz": self.clientSettings.timezone
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies)
-        }.fillDefaults(self.clientSettings.defaultHeaders)
+        }, self.clientSettings.defaultHeaders)
       }, function(err, response, body) {
         if (err) {
           reject(err);
@@ -205,7 +205,7 @@ module.exports = {
   createTask(task, callback = function() {}) {
     var self = this;
 
-    task = task.fillDefaults({
+    task = fillDefaults(task, {
       "title": null,
       "description": null,
       "pGuid": "tasks",
@@ -282,11 +282,11 @@ module.exports = {
         }
         return args;
       })()), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) {
@@ -314,7 +314,7 @@ module.exports = {
   createCollection(collection, callback = function() {}) {
     var self = this;
 
-    collection = collection.fillDefaults({
+    collection = fillDefaults(collection, {
       "order": 2,
       "title": "New Collection",
       "color": "#b14bc9",

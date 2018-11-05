@@ -1,5 +1,5 @@
 const request = require('request');
-var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime} = require("./../helper");
+var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime, fillDefaults} = require("./../helper");
 
 
 module.exports = {
@@ -20,10 +20,10 @@ module.exports = {
         "endDate": endDate,
         "usertz": self.clientSettings.timezone
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies)
-        }.fillDefaults(self.clientSettings.defaultHeaders)
+        }, self.clientSettings.defaultHeaders)
       }, function(err, response, body) {
         if (err) {
           reject(err);
@@ -50,10 +50,10 @@ module.exports = {
             "endDate": endDate,
             "usertz": self.clientSettings.timezone
           }), {
-            headers: {
+            headers: fillDefaults({
               'Host': host,
               'Cookie': cookiesToStr(self.auth.cookies)
-            }.fillDefaults(self.clientSettings.defaultHeaders)
+            }, self.clientSettings.defaultHeaders)
           }, function(err, response, body) {
             if (err) {
               reject(err);
@@ -127,10 +127,10 @@ module.exports = {
         "endDate": endDate,
         "usertz": self.clientSettings.timezone
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies)
-        }.fillDefaults(self.clientSettings.defaultHeaders)
+		  }, self.clientSettings.defaultHeaders)
       }, function(err, response, body) {
         if (err) {
           reject(err);
@@ -166,7 +166,7 @@ module.exports = {
       }
     });
     //console.log(event.alarms);
-    event.recurrence = event.recurrence.fillDefaults({
+    event.recurrence = fillDefaults(event.recurrence, {
       pGuid: eventGuid,
       guid: eventGuid + '*MME-RID',
       recurrenceMasterStartDate: null, // [ 20170726, 2017, 7, 26, 19, 0, 1140 ]
@@ -181,7 +181,7 @@ module.exports = {
       weekDays: null
     });
 
-    event = event.fillDefaults({
+    event = fillDefaults(event, {
       guid: eventGuid,
       pGuid: 'home',
       etag: null,
@@ -294,11 +294,11 @@ module.exports = {
         "endDate": endDate,
         "usertz": self.clientSettings.timezone
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) {
@@ -407,11 +407,11 @@ module.exports = {
         }
         return args;
       })()), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) {
@@ -430,16 +430,4 @@ module.exports = {
 
 function getCTag(etag) {
   return "FT=-@RU=" + etag.substring(etag.search(/[^-]{8}-[^-]{4}-[^-]{4}-[^-]{4}-[^-]{12}/)) + "@S=" + etag.substring(etag.search(/[0-9]{1,}/), etag.search("@"))
-}
-
-Object.prototype.fillDefaults = function(defaults) {
-  Object.keys(defaults).forEach(key => {
-    if (!(key in this)) {
-      this[key] = defaults[key];
-    }
-    else if (typeof defaults[key] == "object" && defaults[key] != null) {
-      this[key] = this[key].fillDefaults(defaults[key]);
-    }
-  });
-  return this;
 }

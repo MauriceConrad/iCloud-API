@@ -1,5 +1,16 @@
 const Cookie = require('cookie');
 
+function fillDefaults(a, b) {
+	Object.keys(b).forEach(key => {
+		if (!(key in a)) {
+			a[key] = b[key];
+		} else if (typeof b[key] == "object" && b[key] != null) {
+			a[key] = fillDefaults(a[key], b[key]);
+		}
+	});
+	return a;
+}
+
 module.exports = {
   getHostFromWebservice(webservice) {
     return webservice.url.replace(":443", "").replace("https://", "");
@@ -75,8 +86,9 @@ module.exports = {
       }
     });
     return main;
-  }
-}
+  },
+  fillDefaults: fillDefaults
+};
 Function.prototype.applyConstructor = function(args) {
   return new (Function.prototype.bind.apply(this, [null].concat(args)));
 }

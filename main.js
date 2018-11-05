@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const fs = require('fs');
 
-const { getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, fillMethods } = require("./resources/helper");
+const { getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, fillMethods, fillDefaults} = require("./resources/helper");
 
 Array.prototype.indexOfKey = indexOfKey;
 
@@ -41,7 +41,7 @@ class iCloud extends EventEmitter {
 
     function sessionInit(session) {
       // Session Validation. This adds default properties to the session that doesn't exists
-      session = session.fillDefaults({
+      session = fillDefaults(session, {
         username: username,
         password: password,
         auth: {
@@ -96,7 +96,7 @@ class iCloud extends EventEmitter {
       });
 
       // Session object is validated. Now, the (self) instance will be extended with session's properties using the fill defaults function.
-      self = self.fillDefaults(session);
+      self = fillDefaults(self, session);
 
       Object.keys(self.apps).forEach(function(appPropName) {
         if ("instanceName" in self.apps[appPropName]) {
@@ -351,17 +351,3 @@ class iCloud extends EventEmitter {
 }
 
 module.exports = iCloud;
-
-// Small self made fillDefaults method to fill an object with default properties
-
-Object.prototype.fillDefaults = function(defaults) {
-  Object.keys(defaults).forEach(key => {
-    if (!(key in this)) {
-      this[key] = defaults[key];
-    }
-    else if (typeof defaults[key] == "object" && defaults[key] != null) {
-      this[key] = this[key].fillDefaults(defaults[key]);
-    }
-  });
-  return this;
-}

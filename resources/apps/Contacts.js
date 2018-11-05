@@ -1,5 +1,5 @@
 const request = require('request');
-var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId} = require("./../helper");
+var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, fillDefaults} = require("./../helper");
 
 
 module.exports = {
@@ -8,10 +8,10 @@ module.exports = {
     var host = getHostFromWebservice(self.account.webservices.contacts);
     var requestPromise = new Promise(function(resolve, reject) {
       request.get("https://" + host + "/co/startup?clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientId=" + self.clientId + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientVersion=2.1&dsid=" + self.account.dsInfo.dsid + "&locale=de_DE&order=first%2Clast", {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies)
-        }.fillDefaults(self.clientSettings.defaultHeaders)
+        }, self.clientSettings.defaultHeaders)
       }, function(err, response, body) {
         if (err) {
           reject(err);
@@ -47,11 +47,11 @@ module.exports = {
       }
       var host = getHostFromWebservice(self.account.webservices.contacts);
       request.post("https://" + host + "/co/contacts/card/?clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientId=" + self.clientId + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientVersion=2.1&dsid=" + self.account.dsInfo.dsid + "&method=" + method + "&prefToken=" + self.Contacts.prefToken + "&syncToken=" + self.Contacts.syncToken, {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+		  }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) {

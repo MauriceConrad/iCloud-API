@@ -4,7 +4,7 @@
   const request = require('request');
   const fs = require('fs');
 
-  var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramStr} = require("./resources/helper");
+  var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramStr, fillDefaults} = require("./resources/helper");
 
   module.exports = {
 
@@ -128,11 +128,11 @@
         "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
         "dsid": self.account.dsInfo.dsid
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content,
         //gzip: true
       }, function(err, response, body) {
@@ -156,11 +156,11 @@
           "dsid": self.account.dsInfo.dsid,
           "pcsEnabled": true
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) return callback(err);
@@ -176,9 +176,7 @@
       //uri = "https://webcourier.push.apple.com/aps?tok=a819303f3199aa62b6be55a9aa635e29b69defc4a261c01ecf4ab4c9c3fcc9b6&ttl=43200";
       //console.log("\n\n", uri, "\n\n");
       var req = request.get(uri, {
-        headers: {
-
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        headers: fillDefaults({}, self.clientSettings.defaultHeaders),
         rejectUnauthorized: false
       }, function(err, response, body) {
         if (err) {
@@ -216,10 +214,10 @@
       });
 
       request.post(url, {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies)
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
 
@@ -247,10 +245,10 @@
       });
 
       request.post(url, {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies)
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
 
@@ -267,7 +265,7 @@
         const url = "https://" + host + "/appleauth/auth";
 
         request.get(url, {
-          headers: {
+          headers: fillDefaults({
             'Referer': signInReferer,
             'Host': host,
             'Cookie': cookiesToStr(self.auth.cookies),
@@ -275,7 +273,7 @@
             'X-Apple-I-FD-Client-Info': JSON.stringify(self.clientSettings.xAppleIFDClientInfo),
             'X-Apple-ID-Session-Id': self.clientSettings.xAppleIDSessionId,
             'scnt': self.clientSettings.scnt
-          }.fillDefaults(self.clientSettings.defaultHeaders),
+          }, self.clientSettings.defaultHeaders),
           //body: content
         }, (err, response, body) => {
           if (err) reject(err);
@@ -290,7 +288,7 @@
         request({
           url: "https://" + host + "/appleauth/auth/verify/trusteddevice/securitycode",
           method: method,
-          headers: {
+          headers: fillDefaults({
             'Content-Type': 'application/json',
             'Referer': signInReferer,
             'Host': host,
@@ -299,7 +297,7 @@
             'X-Apple-I-FD-Client-Info': JSON.stringify(self.clientSettings.xAppleIFDClientInfo),
             'X-Apple-ID-Session-Id': self.clientSettings.xAppleIDSessionId,
             'scnt': self.clientSettings.scnt
-          }.fillDefaults(self.clientSettings.defaultHeaders),
+          }, self.clientSettings.defaultHeaders),
           body: JSON.stringify(bodyObj)
         }, function(err, response, body) {
           if (err) return reject(err);
@@ -315,7 +313,7 @@
         request({
           url: "https://" + host + "/appleauth/auth/verify/phone",
           method: "PUT",
-          headers: {
+          headers: fillDefaults({
             'Content-Type': 'application/json',
             'Referer': signInReferer,
             'Host': host,
@@ -324,7 +322,7 @@
             'X-Apple-I-FD-Client-Info': JSON.stringify(self.clientSettings.xAppleIFDClientInfo),
             'X-Apple-ID-Session-Id': self.clientSettings.xAppleIDSessionId,
             'scnt': self.clientSettings.scnt
-          }.fillDefaults(self.clientSettings.defaultHeaders),
+          }, self.clientSettings.defaultHeaders),
           body: JSON.stringify({
             phoneNumber: {
               id: 1
@@ -343,7 +341,7 @@
       const signInReferer = "https://" + host + "/appleauth/auth/signin?widgetKey=" + self.clientSettings.xAppleWidgetKey + "&locale=" + self.clientSettings.locale + "&font=sf";
       return new Promise(function(resolve, reject) {
         request.post("https://" + host + "/appleauth/auth/2sv/trust", {
-          headers: {
+          headers: fillDefaults({
             'Content-Type': 'application/json',
             'Referer': signInReferer,
             'Host': host,
@@ -352,7 +350,7 @@
             'X-Apple-I-FD-Client-Info': JSON.stringify(self.clientSettings.xAppleIFDClientInfo),
             'X-Apple-ID-Session-Id': self.clientSettings.xAppleIDSessionId,
             'scnt': self.clientSettings.scnt
-          }.fillDefaults(self.clientSettings.defaultHeaders)
+          }, self.clientSettings.defaultHeaders)
         }, function(err, response, body) {
           if (err) return reject(err);
 

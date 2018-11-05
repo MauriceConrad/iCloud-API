@@ -1,6 +1,6 @@
 const request = require('request');
 const https = require('https');
-var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies} = require("./../helper");
+var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, fillDefaults} = require("./../helper");
 
 function isFolder(item) {
   var folderTypes = ["FOLDER", "APP_LIBRARY"];
@@ -149,11 +149,11 @@ module.exports = {
         ]);
         var host = getHostFromWebservice(self.account.webservices.drivews);
         request.post("https://" + host + "/retrieveItemDetailsInFolders?clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientId=" + self.clientId + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&dsid=" + self.account.dsInfo.dsid, {
-          headers: {
+          headers: fillDefaults({
             'Host': host,
             'Cookie': cookiesToStr(self.auth.cookies),
             'Content-Length': content.length
-          }.fillDefaults(self.clientSettings.defaultHeaders),
+          }, self.clientSettings.defaultHeaders),
           body: content
         }, function(err, response, body) {
           if (err) return callback(err);
@@ -171,10 +171,10 @@ module.exports = {
         var host = getHostFromWebservice(self.account.webservices.docws);
         var url = "https://" + host + "/ws/com.apple.CloudDocs/download/by_id?document_id=" + file.docwsid + "&token=" + self.auth.token + "&clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientId=" + self.clientId + "&dsid=" + self.account.dsInfo.dsid;
         request.get(url, {
-          headers: {
+          headers: fillDefaults({
             'Host': host,
             'Cookie': cookiesToStr(self.auth.cookies)
-          }.fillDefaults(self.clientSettings.defaultHeaders)
+          }, self.clientSettings.defaultHeaders)
         }, function(err, response, body) {
           if (err) return callback(err);
           file.contents = JSON.parse(body);
@@ -216,11 +216,11 @@ module.exports = {
           });
 
           request.post("https://" + host + "/createFolders?clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientId=" + self.clientId + "&dsid=" + self.account.dsInfo.dsid, {
-            headers: {
+            headers: fillDefaults({
               'Host': host,
               'Cookie': cookiesToStr(self.auth.cookies),
               'Content-Length': content.length
-            }.fillDefaults(self.clientSettings.defaultHeaders),
+            }, self.clientSettings.defaultHeaders),
             body: content
           }, function(err, response, body) {
             if (err) {
@@ -265,11 +265,11 @@ module.exports = {
             // Last item
             content = JSON.stringify(content);
             request.post("https://" + host + "/deleteItems?clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientId=" + self.clientId + "&dsid=" + self.account.dsInfo.dsid, {
-              headers: {
+              headers: fillDefaults({
                 'Host': host,
                 'Cookie': cookiesToStr(self.auth.cookies),
                 'Content-Length': content.length
-              }.fillDefaults(self.clientSettings.defaultHeaders),
+              }, self.clientSettings.defaultHeaders),
               body: content
             }, function(err, response, body) {
               if (err) {
@@ -313,11 +313,11 @@ module.exports = {
           if (index >= Object.keys(items).length - 1) {
             content = JSON.stringify(content);
             request.post("https://" + host + "/renameItems?clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientId=" + self.clientId + "&dsid=" + self.account.dsInfo.dsid, {
-              headers: {
+              headers: fillDefaults({
                 'Host': host,
                 'Cookie': cookiesToStr(self.auth.cookies),
                 'Content-Length': content.length
-              }.fillDefaults(self.clientSettings.defaultHeaders),
+              }, self.clientSettings.defaultHeaders),
               body: content
             }, function(err, response, body) {
               if (err) {
@@ -347,11 +347,11 @@ module.exports = {
     });
 
     request.post("https://" + host + "/ws/com.apple.CloudDocs/upload/web?token=NONE&clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientId=1356E574-A2A4-415F-A028-1BC2FB56FFB3&dsid=11298614181", {
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders),
+      }, self.clientSettings.defaultHeaders),
       body: content
     }, function(err, response, body) {
       if (err) return callback(err);
@@ -359,11 +359,11 @@ module.exports = {
       console.log(result);
       var content = '------WebKitFormBoundaryeKzg6g4kckug2g31\r\nContent-Disposition: form-data; name="files"; filename="file.txt"\r\nContent-Type: text/plain\r\n\r\n\r\n------WebKitFormBoundaryeKzg6g4kckug2g31--\r\n';
       var req = request.post(result[0].url, {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) return callback(err);
