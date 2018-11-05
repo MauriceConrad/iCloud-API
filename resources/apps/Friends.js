@@ -95,7 +95,7 @@ module.exports = {
                 info: result.following[result.following.indexOfKey(pos.id, "id")] || null,
                 contact: result.contactDetails[result.contactDetails.indexOfKey(pos.id, "id")] || null
               },
-              adress: pos.location.address,
+              address: pos.location.address,
               longitude: pos.location.longitude,
               latitude: pos.location.latitude
             };
