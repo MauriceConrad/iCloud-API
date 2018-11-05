@@ -85,10 +85,12 @@ module.exports = {
         var result = JSON.parse(body);
 
         var cookies = parseCookieStr(response.headers["set-cookie"]);
-        self.auth.cookies = fillCookies(self.auth.cookies, cookies);
+		  self.auth.cookies = fillCookies(self.auth.cookies, cookies);
+		  
+		  var locations = [];
 
         if ("locations" in result) {
-          var locations = result.locations.map(function(pos) {
+          locations = result.locations.map(function(pos) {
             if (pos.location == null) return {};
             return {
               person: {
@@ -100,10 +102,8 @@ module.exports = {
               latitude: pos.location.latitude
             };
           });
-        }
-        else {
-          var locations = [];
-        }
+		  }
+		  
         resolve(locations);
         callback(null, locations);
       });
