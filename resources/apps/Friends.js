@@ -85,25 +85,25 @@ module.exports = {
         var result = JSON.parse(body);
 
         var cookies = parseCookieStr(response.headers["set-cookie"]);
-        self.auth.cookies = fillCookies(self.auth.cookies, cookies);
+		  self.auth.cookies = fillCookies(self.auth.cookies, cookies);
+		  
+		  var locations = [];
 
         if ("locations" in result) {
-          var locations = result.locations.map(function(pos) {
+          locations = result.locations.map(function(pos) {
             if (pos.location == null) return {};
             return {
               person: {
                 info: result.following[result.following.indexOfKey(pos.id, "id")] || null,
                 contact: result.contactDetails[result.contactDetails.indexOfKey(pos.id, "id")] || null
               },
-              adress: pos.location.address,
+              address: pos.location.address,
               longitude: pos.location.longitude,
               latitude: pos.location.latitude
             };
           });
-        }
-        else {
-          var locations = [];
-        }
+		  }
+		  
         resolve(locations);
         callback(null, locations);
       });
