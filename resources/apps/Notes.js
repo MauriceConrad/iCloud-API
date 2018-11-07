@@ -1,5 +1,5 @@
 const request = require('request');
-var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime} = require("./../helper");
+var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime, fillDefaults} = require("./../helper");
 
 
 
@@ -114,11 +114,11 @@ module.exports = {
       "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
       "dsid": self.account.dsInfo.dsid
     }), {
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders),
+      }, self.clientSettings.defaultHeaders),
       body: content
     }, function(err, response, body) {
       if (err) return callback(err);
@@ -205,11 +205,11 @@ module.exports = {
       "remapEnums": true,
       "ckjsVersion": "2.0"
     }), {
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders),
+      }, self.clientSettings.defaultHeaders),
       body: content
     }, function(err, response, body) {
       if (err) return callback(err);
@@ -230,11 +230,11 @@ module.exports = {
       "remapEnums": true,
       "ckjsVersion": "2.0"
     }), {
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders),
+      }, self.clientSettings.defaultHeaders),
       body: content
     }, function(err, response, body) {
       if (err) return console.error(err);

@@ -1,5 +1,5 @@
 const request = require('request');
-var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr} = require("./../helper");
+var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, fillDefaults} = require("./../helper");
 
 module.exports = {
   initialized: false,
@@ -53,11 +53,11 @@ module.exports = {
       "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
       "dsid": self.account.dsInfo.dsid,
     }), {
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders),
+      }, self.clientSettings.defaultHeaders),
       body: content
     }, function(err, response, body) {
       if (err) return callback(err);
@@ -160,11 +160,11 @@ module.exports = {
       "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
       "dsid": self.account.dsInfo.dsid,
     }), {
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders),
+      }, self.clientSettings.defaultHeaders),
       body: content
     }, function(err, response, body) {
       if (err) return callback(err);

@@ -1,5 +1,5 @@
 const request = require('request');
-var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, paramString} = require("./../helper");
+var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, paramString, fillDefaults} = require("./../helper");
 
 module.exports = {
   get(callback = function() {}) {
@@ -8,10 +8,10 @@ module.exports = {
 
     var photosPromise = new Promise(function(resolve, reject) {
       request.get("https://" + host + "/database/1/com.apple.photos.cloud/production/private/zones/list?remapEnums=true&ckjsBuildVersion=17DProjectDev77&ckjsVersion=2.0.5&getCurrentSyncToken=true&clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientId=" + self.clientId + "&dsid=" + self.account.dsInfo.dsid, {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies)
-        }.fillDefaults(self.clientSettings.defaultHeaders)
+        }, self.clientSettings.defaultHeaders)
       }, function(err, response, body) {
         if (err) {
           reject(err);
@@ -174,11 +174,11 @@ module.exports = {
 
         content = JSON.stringify(content);
         request.post("https://" + host + "/database/1/com.apple.photos.cloud/production/private/records/query?remapEnums=true&ckjsBuildVersion=17DProjectDev77&ckjsVersion=2.0.5&getCurrentSyncToken=true&clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientId=" + self.clientId + "&dsid=" + self.account.dsInfo.dsid, {
-          headers: {
+          headers: fillDefaults({
             'Host': host,
             'Cookie': cookiesToStr(self.auth.cookies),
             'Content-Length': content.length
-          }.fillDefaults(self.clientSettings.defaultHeaders),
+          }, self.clientSettings.defaultHeaders),
           body: content
         }, function(err, response, body) {
           if (err) {
@@ -238,11 +238,11 @@ module.exports = {
     var content = fs.readFileSync(file);
     request("https://" + host + "/upload?filename=" + file.jpg + "&dsid=" + self.account.dsInfo.dsid + "&lastModDate=" + (new Date().getTime()) + "&timezoneOffset=-120", {
       method: "POST",
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders)
+      }, self.clientSettings.defaultHeaders)
     }, function(err, response, body) {
       if (err) return callback(err);
       console.log(body);

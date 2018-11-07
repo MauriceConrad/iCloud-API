@@ -1,5 +1,5 @@
 const request = require('request');
-var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime} = require("./../helper");
+var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime, fillDefaults} = require("./../helper");
 
 
 module.exports = {
@@ -193,7 +193,7 @@ module.exports = {
       }
       function sendMail(address, fullName) {
         var from = fullName + "<" + address + ">";
-        message = message.fillDefaults({
+        message = fillDefaults(message, {
           "date": new Date().toString(),
           "to": null,
           "subject": "",
@@ -233,7 +233,7 @@ module.exports = {
   createFolder(folder, callback = function() {}) {
     var self = this;
 
-    var params = folder.fillDefaults({
+    var params = fillDefaults(folder, {
       name: null,
       parent: null
     });
@@ -311,11 +311,11 @@ module.exports = {
       "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
       "dsid": self.account.dsInfo.dsid
     }), {
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders),
+      }, self.clientSettings.defaultHeaders),
       body: content
     }, function(err, response, body) {
       if (err) return callback(err);
@@ -353,11 +353,11 @@ module.exports = {
         "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
         "dsid": self.account.dsInfo.dsid
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) {
@@ -408,11 +408,11 @@ module.exports = {
       "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
       "dsid": self.account.dsInfo.dsid
     }), {
-      headers: {
+      headers: fillDefaults({
         'Host': host,
         'Cookie': cookiesToStr(self.auth.cookies),
         'Content-Length': content.length
-      }.fillDefaults(self.clientSettings.defaultHeaders),
+      }, self.clientSettings.defaultHeaders),
       body: content
     }, function(err, response, body) {
       if (err) return callback(err);
