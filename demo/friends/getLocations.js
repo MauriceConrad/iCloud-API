@@ -5,7 +5,7 @@ const promptiCloud = require("../prompt-credentials");
   // Login to icloud and ask for new credentials if needed
   const myCloud = await promptiCloud();
 
-  var locations = await myCloud.Friends.getLocations();
+  const locations = await myCloud.Friends.getLocations();
 
   console.log(locations);
 

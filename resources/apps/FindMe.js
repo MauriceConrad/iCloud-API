@@ -104,16 +104,12 @@ module.exports = {
       });
     }
   },
-  __data(callback) {
-    var self = this;
-
-    var host = getHostFromWebservice(self.account.webservices.findme);
-    // Define request body for post with own properties
-    var content = JSON.stringify({
+  __generateContent() {
+    return {
       "serverContext": {
         "minCallbackIntervalInMS": 1000,
         "enable2FAFamilyActions": false,
-        "preferredLanguage": self.clientSettings.language,
+        "preferredLanguage": this.clientSettings.language,
         "lastSessionExtensionTime": null,
         "enableMapStats": true,
         "callbackIntervalInMS": 10000,
@@ -127,16 +123,12 @@ module.exports = {
         "minTrackLocThresholdInMts": 100,
         "maxLocatingTime": 90000,
         "sessionLifespan": 900000,
-        //"info": "/OwnTkNEhM0l5Ba6TZ73nswixOQpymqAaRWQO7lg8S8YJps5Com2xtj5VZ7rIvnX",
-        //"prefsUpdateTime": 1405254598666,
         "useAuthWidget": true,
-        "clientId": self.clientId,
+        "clientId": this.clientId,
         "enable2FAFamilyRemove": false,
-        //"serverTimestamp": 1500908149114,
         "macCount": 0,
         "deviceLoadStatus": "200",
         "maxDeviceLoadTime": 60000,
-        //"prsId": 181764936,
         "showSllNow": false,
         "cloudUser": true,
         "enable2FAErase": false,
@@ -145,13 +137,20 @@ module.exports = {
       "clientContext": {
         "appName": "iCloud Find (Web)",
         "appVersion": "2.0",
-        "timezone": self.clientSettings.timezone,
+        "timezone": this.clientSettings.timezone,
         "inactiveTime": 0,
         "apiVersion": "3.0",
         "deviceListVersion": 1,
         "fmly": true
       }
-    });
+    };
+  },
+  __data(callback) {
+    const self = this;
+
+    var host = getHostFromWebservice(self.account.webservices.findme);
+    // Define request body for post with own properties
+    var content = JSON.stringify(self.__generateContent());
 
     // Post the request
     request.post("https://" + host + "/fmipservice/client/web/initClient?" + paramStr({
@@ -184,6 +183,58 @@ module.exports = {
       // Return result
       callback(null, result);
     });
+  },
+  playSound(device, callback = function() {}) {
+    const self = this;
+
+    const deviceId = typeof device == "object" ? device.id : device;
+
+    const content = JSON.stringify(Object.assign(self.FindMe.__generateContent(), {
+      "device": deviceId,
+      "subject": "Reminder \u201eFInd my iPhone\u201c"
+    }));
+
+    var host = getHostFromWebservice(this.account.webservices.findme);
+
+    return new Promise(function(resolve, reject) {
+      request.post("https://" + host + "/fmipservice/client/web/playSound?" + paramStr({
+        "clientBuildNumber": self.clientSettings.clientBuildNumber,
+        "clientId": self.clientId,
+        "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
+        "dsid": self.account.dsInfo.dsid,
+      }), {
+        headers: {
+          'Host': host,
+          'Cookie': cookiesToStr(self.auth.cookies),
+          //'Content-Length': content.length
+        }.fillDefaults(self.clientSettings.defaultHeaders),
+        body: content
+      }, function(err, response, body) {
+        if (err) return callback(err);
+
+        try {
+          // Try to parse the result as JSON (Sometimes it fails because the cookies are invalid)
+          var result = JSON.parse(body);
+        } catch (e) {
+          reject({
+            error: "Request body is no valid JSON",
+            errorCode: 13,
+            requestBody: body
+          });
+          return callback({
+            error: "Request body is no valid JSON",
+            errorCode: 13,
+            requestBody: body
+          });
+        }
+        if (result) {
+          callback(null, result);
+          resolve(result);
+        }
+
+      });
+    });
+
   }
 }
 

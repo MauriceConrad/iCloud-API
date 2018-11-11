@@ -104,6 +104,16 @@ var myCloud = new iCloud("path/to/my/session.json", username, password);
 myCloud.saveSession();
 ```
 
+#### Save Session automatically
+
+To save the session automatically when something changes, just listen to the `sessionUpdate` event and apply `saveSession()`.
+
+```javascript
+myCloud.on("sessionUpdate", function() {
+  myCloud.saveSession();
+});
+```
+
 ## IMPORTANT
 
 **Please**. Save your sessions and use them often as possible. This avoids problems with the API. If you do not use session saving, your client has to do the complete login process every time you start your script. This takes a lot of time and destroys functionality on Apples's servers because they may stop sending important cookies. Therefore: **Just do it.**
@@ -674,10 +684,21 @@ Sadly there are still problems with the API. Sometimes the cookies of the sessio
 
 In this case you have to reset your whole session :(
 
+#### Play Sound
 
-### Data
+To play sound on a device, use the `playSound()` method.
 
-The method `__data` can be used to get your device's data without
+```javascript
+// By giving a device's object
+await myCloud.FindMe.playSound(myDevice);
+
+// By giving just a device's ID
+await myCloud.FindMe.playSound("XXX");
+```
+
+To get a device's object, just call `FindMe.get()`. This lists all devices and their related ID.
+
+**Demo:** `demo/findme/playSound.js`
 
 ### Reminders
 

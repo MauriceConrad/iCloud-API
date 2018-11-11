@@ -11,5 +11,15 @@ const promptiCloud = require("../prompt-credentials");
   catch (e) {
     console.error(e);
   }
-  console.log(devices);
+  const myPhone = devices.content[0];
+
+  console.log("Playing sound on " + myPhone.name + "...");
+
+  try {
+    const res = await myCloud.FindMe.playSound(myPhone.id);
+
+    console.log("Successfully played sound!");
+  } catch (e) {
+    console.error(e);
+  }
 })();

@@ -84,50 +84,6 @@ module.exports = function login() {
       }
     });
 
-    /*console.log("\nPlease log in with your credentials! (Username = Mail)");
-    console.log("Will save your session at '" + sessionPath + "'\n");
-    prompt.get({
-        properties: {
-          username: {
-            pattern: /^.*$/,
-            message: 'Mail',
-            required: false
-          },
-          password: {
-            required: false,
-            hidden: true
-          }
-        }
-      }, function(err, input) {
-      if (err) return console.error(err);
-
-      // This creates your iCloud instance
-      var myCloud = new iCloud(sessionPath, input.username, input.password);
-
-      myCloud.on("ready", async function() {
-
-        if (myCloud.twoFactorAuthenticationIsRequired) {
-          prompt.get(["Security Code"], function(err, input) {
-            if (err) return console.error(err);
-            const code = input["Security Code"];
-            myCloud.securityCode = code;
-          });
-        }
-        else {
-          console.log("You are logged in successfully!");
-          console.log("Get contact data...");
-          //var contactsData = await myCloud.Contacts.list();
-          //console.log(contactsData);
-          resolve(myCloud);
-        }
-
-      });
-
-      myCloud.on("sessionUpdate", function() {
-        myCloud.saveSession();
-      });
-    });*/
-
 
   });
 }
