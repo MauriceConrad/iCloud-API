@@ -229,7 +229,7 @@ This is the basic iCloud API that you can use to interact with iCloud services.
 * [Drive](#icloud--drive)
 * [Calendar](#calendar)
 * [Photos](#photos)
-* [Find Me](#find--me)
+* [Find Me](#find-me)
 * [Reminders](#reminders)
 * [Mail](#mail)
 * [Notes](#notes)
