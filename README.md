@@ -257,14 +257,12 @@ To use `change()`, `new()` & `delete()` you firstly have to `list()` the contact
 
 #### Change
 
-To change a contact's properties, just replace it's properties and `change(myContact)` it.
+To change a contact's properties, just change the object's properties and call `change(myContact)`.
 
 ```javascript
-myCloud.Calendar.change(myChangedContact, function(err, changeset) { // myChangedContact is just an contact object you got from 'list()'
-  if (err) return console.error(err);
-  // Successfully changed
-  console.log(changeset);
-});
+myContact.lastName = "NewLastName";
+
+const changeset = await myCloud.Contacts.change(myContact);
 ```
 
 **Demo:** `demo/contacts/changeContact.js`
@@ -274,11 +272,7 @@ myCloud.Calendar.change(myChangedContact, function(err, changeset) { // myChange
 Deleting a contact is also easy like changing. Just use a contact's object as argument when calling `delete()`
 
 ```javascript
-myCloud.Contacts.delete(myContactIDontLike, function(err, deletedResult) { // myContactIDontLike is just an contact object you got from 'list()'
-  if (err) return console.error(err);
-  // Successfully deleted
-  console.log(deletedResult);
-});
+const delChangeset = await myCloud.Contacts.delete(myContactIDontLike);
 ```
 
 **Demo:** `demo/contacts/deleteContact.js`
@@ -288,7 +282,7 @@ myCloud.Contacts.delete(myContactIDontLike, function(err, deletedResult) { // my
 Creating a new contact is also really simple. You put a self-made contact-object as argument to `new()`. What a kind of properties a contact can have, is Apples work and this API just use apples JSON structures. If you need to know it, just loadan existing contact and have a look at it's object structure.
 
 ```javascript
-myCloud.Contacts.new({
+const createChangeset = await myCloud.Contacts.new({
   firstName: 'New',
   lastName: 'Guy',
   emailAddresses: [
@@ -298,10 +292,6 @@ myCloud.Contacts.new({
     }
   ],
   isCompany: false
-}, function(err, newContact) {
-  if (err) return console.error(err);
-  // Successfully created a new contact
-  console.log(newContact);
 });
 ```
 
@@ -310,11 +300,7 @@ myCloud.Contacts.new({
 ### Friends
 
 ```javascript
-myCloud.Friends.getLocations(function(err, locations) {
-  if (err) return console.error(err);
-  // Please keep in mind that it doesn't list anything when you call it the first time because the locations are still in progress. But after a few seconds after your first 'initialization' call, it returns the position of your friends.
-  console.log(locations);
-});
+const locations = await myCloud.Friends.getLocations();
 ```
 
 Please also remember that the fist requests maybe doesn't returns a position for the devices (Same thing when using *FindMe*) because the position is still in progress. Sometimes you have to wait a few seconds.
@@ -340,11 +326,7 @@ All methods of this API accept as first argument such a *drivewsid*.
 #### Get Item
 
 ```javascript
-myCloud.Drive.getItem("FOLDER::com.apple.CloudDocs::root", function(err, itemInfo) {
-  if (err) return console.error(err);
-  // This is your root folder
-  console.log(itemInfo);
-});
+const itemInfo = await myCloud.Drive.getItem("FOLDER::com.apple.CloudDocs::root");
 ```
 
 **Demo:** `demo/drive/getItem.js`
@@ -361,9 +343,7 @@ But because I really like to use UNIX file paths directly I implemented a way th
 That means you can just use a UNIX file path instead of a *drivewsid* if you know the path to your item.
 
 ```javascript
-myCloud.Drive.getItem("/myFolder/contains/my/nice/item.txt", function(err, itemInfo) {
-  if (err) return console.error(err);
-}, true); // If using folder cache (Only necessary for UNIX paths) (Default is true)
+const itemInfo = await myCloud.Drive.getItem("/myFolder/contains/my/nice/item.txt", undefined, true); // If using folder cache (Only necessary for UNIX paths) (Default is true)
 ```
 
 ##### Result
@@ -391,15 +371,10 @@ To become an impression of such a result, just try it out :)
 The renaming works really similar. It also accepts UNIX paths but also *docwsid*'s. The only difference is that it accepts a list with items.
 
 ```javascript
-myCloud.Drive.renameItems({
+const changeset = await myCloud.Drive.renameItems({
   "/my/item/with/path.txt": "new name.txt", // Of course you can use a drivewsid
   "Oh/another/item.txt": "renamed.txt" // Of course you can use a drivewsid
-}, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result is the change set that indicates what you did and in which way you were successfully
-  console.log(result);
-}, true); // If using folder cache (Only necessary for UNIX paths) (Default is true)
+}, undefined, true); // If using folder cache (Only necessary for UNIX paths) (Default is true)
 ```
 
 But please remember that it can cost a lot of time when there many not cached folders on the way and you use UNIX paths.
@@ -412,15 +387,10 @@ But please remember that it can cost a lot of time when there many not cached fo
 The same logic works when using `deleteItems()`. The only difference is that you don't use an object as argument but an array. Theoretically you can also use single string if you just have one item to delete.
 
 ```javascript
-myCloud.Drive.deleteItems([
+const delChangeset = await myCloud.Drive.deleteItems([
   "/Test/this folder is new",
   "/Test/this folder is also new"
-], function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result is the change set that indicates what you did and in which way you were successfully
-  console.log(result);
-}, true); // If using folder cache (Only necessary for UNIX paths) (Default is true)
+], undefined, true); // If using folder cache (Only necessary for UNIX paths) (Default is true)
 ```
 
 But please remember that it can cost a lot of time when there many not cached folders on the way and you use UNIX paths.
@@ -434,12 +404,7 @@ This method provides functionality to create multiple folders in one parent fold
 ```javascript
 // 1st argument: '/Test' is the parent folder ( Can always be a 'drivewsid'! )
 // 2nd argument: Array with new folders
-myCloud.Drive.createFolders("/Test", ["this folder is new"], function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The changeset for your created folders
-  console.log(result);
-}, true); // If using folder cache (Only necessary for UNIX paths) (Default is true)
+const createChangeset = await myCloud.Drive.createFolders("/Test", ["this folder is new"], undefined, true); // If using folder cache (Only necessary for UNIX paths) (Default is true)
 ```
 
 **Demo:** `demo/drive/createFolders.js`
@@ -460,12 +425,7 @@ List your collections is a save way to know on which points you can define new e
 You do it like the following:
 
 ```javascript
-myCloud.Calendar.getCollections(function(err, collections) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Return the collections
-  console.log(collections);
-});
+const collections = await myCloud.Calendar.getCollections();
 ```
 
 The structure of a collection is not so complicated, therefore I don't explain it detailed. Just have a look at it and try it out :)
@@ -478,12 +438,7 @@ Please note that this maybe takes time because every event is requested for deta
 
 ```javascript
 // Get all events from the 7th July 2017 to 9th August 2017
-myCloud.Calendar.getEvents("2017-07-15", "2017-08-09", function(err, events) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // All events in your time area
-  console.log(events);
-});
+const events = await myCloud.Calendar.getEvents("2017-07-15", "2017-08-09");
 ```
 
 **Demo:** `demo/calendar/getEvents.js`
@@ -496,15 +451,10 @@ An event contains a lot of properties such like `recurrence`, `alarms` which exp
 #### Create Collection
 
 ```javascript
-myCloud.Calendar.createCollection({
+const createChangeset = await myCloud.Calendar.createCollection({
   // Properties for your collection (Everything like id's will be calculated automatically)
   title: "Mein Kalendar 2!", // The name of the collection
   color: "#ffe070" // The color that will be displayed in iCloud clients and represent the collection (Optional default is #ff2d55)
-}, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Return the changeset for the new collection
-  console.log(result);
 });
 ```
 
@@ -520,7 +470,7 @@ In this code example is not every possible property used. Everything that can be
 
 
 ```javascript
-myCloud.Calendar.createEvent({
+const createChangeset = await myCloud.Calendar.createEvent({
   title: "Viele", // Required
   location: "My City", // Optional
   description: "This is the best description ever", // Optional
@@ -543,11 +493,6 @@ myCloud.Calendar.createEvent({
   },
   startDate: new Date("2017-07-26 12:00"), // UTC Time is required from local, therefore the event start time means your local 12:00)
   endDate: new Date("2017-07-26 13:00") // Same here
-}, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The changeset of your new event
-  console.log(result);
 });
 ```
 
@@ -591,12 +536,7 @@ The properties `count` & `until` contradict each other. *Just use one of them to
 // 'myEventIDontLike' is just an event object you got from 'getEvents()'
 
 // 2nd argument: true - If you want to delete all recurred events ('recurrence') (Default is false)
-myCloud.Calendar.deleteEvent(myEventIDontLike, true, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The changeset for your deleted event
-  console.log(result);
-});
+const delChangeset = await myCloud.Calendar.deleteEvent(myEventIDontLike, true);
 ```
 
 If you want to delete **all** recurring events after one special event, just set the 2nd argument to `true`. This will **not** delete all events before the event you set as 1st argument but all of the same type *after* it.
@@ -611,12 +551,7 @@ For example, if you have an event that starts at 7th of July and will be recurre
 // 'myEvent' is just an event object you got from 'getEvents()'
 myEvent.location = "This place is much better";
 // 2nd argument: true - If you want to change all recurred events ('recurrence') (Default is false)
-myCloud.Calendar.changeEvent(myEvent, true, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The changeset for your deleted event
-  console.log(result);
-});
+const changeset = await myCloud.Calendar.changeEvent(myEvent, true);
 ```
 
 **Demo:** `demo/calendar/changeEvent.js`
@@ -628,12 +563,7 @@ myCloud.Calendar.changeEvent(myEvent, true, function(err, result) {
 Please make sure that this service needs *PCS-Cookies*. Sometimes they aren't there because of some security aspects of iCloud (e.g. You take too many logins in a small time area). Don't care about this normally, just keep it in mind when something doesn't work as expected.
 
 ```javascript
-myCloud.Photos.get(function(err, images) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The images list
-  console.log(images);
-});
+const images = await myCloud.Photos.get();
 ```
 
 **Demo:** `demo/photos/getPhotos.js`
@@ -653,15 +583,7 @@ This service is very good protected by Apple. As you know from iCloud.com you ha
 #### Get
 
 ```javascript
-myCloud.FindMe.get("my.account@mail.com", "totally-save-password", function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Your devices and everything iCloud knows about them
-  console.log(result);
-  // Your devices and their positions (if they are avaible)
-  console.log(result.content);
-
-});
+const devices = await myCloud.FindMe.get("my.account@mail.com", "totally-save-password");
 ```
 
 You do not have to give your credentials again, these arguments are optional. Normally they will be used from the session instantly. (Your session remembers your password if you do not delete it).
@@ -677,7 +599,7 @@ myCloud.FindMe.initialized = false;
 
 
 // A new call 'get()' will re-initialize everything
-myCloud.FindMe.get("my.account@mail.com", "totally-save-password", [Function]);
+const devices = await myCloud.FindMe.get("my.account@mail.com", "totally-save-password");
 ```
 
 Sadly there are still problems with the API. Sometimes the cookies of the session are invalid in general and `get()` still does not not work.
@@ -714,12 +636,7 @@ As I already explained, these methods return **collections** and within them, th
 
 
 ```javascript
-myCloud.Reminders.getOpenTasks(function(err, collections) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // All reminders
-  console.log(collections);
-});
+const tasks = await myCloud.Reminders.getOpenTasks();
 ```
 
 **Demo:** `demo/reminders/getOpenTasks.js`
@@ -744,12 +661,7 @@ myCloud.Reminders.getCompletedTasks(function(err, tasks) {
 ```javascript
 // 'myTaskIDontLike' is just a task object we want to delete
 
-myCloud.Reminders.deleteTask(myTaskIDontLike, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Changeset
-  console.log(result);
-});
+const delChangeset = await myCloud.Reminders.deleteTask(myTaskIDontLike);
 ```
 
 **Demo:** `demo/reminders/deleteTask.js`
@@ -760,12 +672,7 @@ myCloud.Reminders.deleteTask(myTaskIDontLike, function(err, result) {
 // 'myTask' is just a task object we want to change
 
 myTask.title = "This is the new title :)"; // Don't use special characters like 'ä', 'ö', etc.
-myCloud.Reminders.changeTask(myTask, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Changeset
-  console.log(result);
-});
+const changeset = await myCloud.Reminders.changeTask(myTask);
 ```
 
 **Demo:** `demo/reminders/changeTask.js`
@@ -773,16 +680,11 @@ myCloud.Reminders.changeTask(myTask, function(err, result) {
 #### Create Task
 
 ```javascript
-myCloud.Reminders.createTask({
+const createChangeset = await myCloud.Reminders.createTask({
   title: "I have to do this!",
   pGuid: "tasks", // The 'guid' of a collection
   priority: 1, // 1 is "High", 5 is "Medium" & 9 is "Low",
   description: "This describes by task perfectly!"
-}, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Changeset & the new task
-  console.log(result);
 });
 ```
 
@@ -803,12 +705,7 @@ To complete a task, just do the following:
 ```javascript
 // 'myTaskICompleted' is the task you want to define as 'completed'
 
-myCloud.Reminders.completeTask(myTaskICompleted, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Changeset
-  console.log(result);
-});
+const chageset = await myCloud.Reminders.completeTask(myTaskICompleted);
 ```
 
 **Demo:** `demo/reminders/completeTask.js`
@@ -816,14 +713,9 @@ myCloud.Reminders.completeTask(myTaskICompleted, function(err, result) {
 #### Create Collection
 
 ```javascript
-myCloud.Reminders.createCollection({
+const createChangeset = await myCloud.Reminders.createCollection({
   title: "My new collection",
   symbolicColor: "green" // Default 'auto'
-}, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Changeset & the new collection
-  console.log(result);
 });
 ```
 
@@ -838,12 +730,7 @@ As you may know from `Calendar`, you were allowed to use hex color codes as *#fa
 ```javascript
 // 'myCollection' is just a collection we want to change
 myCollection.symbolicColor = "green"; // Sets the symbolic color of the collection to 'green'
-myCloud.Reminders.changeCollection(myCollection, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Changeset
-  console.log(result);
-});
+const changeset = await myCloud.Reminders.changeCollection(myCollection);
 ```
 
 **Demo:** `demo/reminders/changeCollection.js`
@@ -853,10 +740,7 @@ myCloud.Reminders.changeCollection(myCollection, function(err, result) {
 ```javascript
 // 'myCollectionIDontLike' is just a collection object we want to delete
 
-myCloud.Reminders.deleteCollection(myCollectionIDontLike, function(err, result) {
-  if (err) return console.error(err);
-  console.log(result);
-});
+const delChangeset = await myCloud.Reminders.deleteCollection(myCollectionIDontLike);
 ```
 
 **Demo:** `demo/reminders/deleteCollection.js`
@@ -872,12 +756,7 @@ Please keep in mind that the Mail service of iCloud and all related endpoints ne
 Mailing systems in general work with folders that sort your mails. Such as `Sent`, `Inbox`, `Deleted`, `VIP` and your own folders.
 
 ```javascript
-myCloud.Mail.getFolders(function(err, folders) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Your folders
-  console.log(folders);
-});
+const folders = await myCloud.Mail.getFolders();
 ```
 
 **Demo:** `demo/mail/getFolders.js`
@@ -890,12 +769,7 @@ Just try it out and have a look at the structure :)
 // 'myFolder' is just a folder object we got from 'getFolders()'
 // The 2nd and 3rd argument describe that we list the next 50 mails beginning at index 1 (first/newest mail)
 // The sort order is descending / newest mails first
-myCloud.Mail.listMessages(myFolder, 1, 50, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Folder's 'meta' and 'messages' data
-  console.log(result);
-});
+const messagesData = await myCloud.Mail.listMessages(myFolder, 1, 50);
 ```
 
 **Demo:** `demo/mail/listMessages.js`
@@ -908,12 +782,7 @@ Maybe you already noticed that a message object from 'listMessages' doesn't cont
 
 ```javascript
 // 'myMail' is just a message object we got from 'listMessages()'
-myCloud.Mail.getMessage(myMail, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Detailed info about the message
-  console.log(result);
-});
+const messageDetail = await myCloud.Mail.getMessage(myMail);
 ```
 
 **Demo:** `demo/mail/getMessage.js`
@@ -925,15 +794,10 @@ Please notice that you can only move messages that are part the same folder to a
 ```javascript
 // Items of the array are the messages you want to move (message objects)
 // Has to be an array if you have more than one messages you want to move. If it's only one message, it's message object can be used as argument instead
-myCloud.Mail.move([
+const changeset = await myCloud.Mail.move([
   myMessage1, // The two messages have to be in the same folder!
   myMessage2 // Otherwise an error will occur
-], destinationFolder, function(err, result) {
-  // If an error will occur
-  if (err) return console.error(err);
-  // The result of your movement
-  console.log(result);
-}); // 2nd argument is the destination folder (folder object)
+], destinationFolder); // 2nd argument is the destination folder (folder object)
 ```
 
 **Demo:** `demo/mail/moveMessages.js`
@@ -943,15 +807,10 @@ myCloud.Mail.move([
 ```javascript
 // Items of the array are the messages you want to move (message objects)
 // Has to be an array if you have more than one messages you want to move. If it's only one message, it's message object can be used as argument instead
-myCloud.Mail.delete([
+const delChangeset = await myCloud.Mail.delete([
   myMessage1,
   myMessage2
-], function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result of your deletion
-  console.log(result);
-});
+]);
 ```
 
 **Demo:** `demo/mail/deleteMessages.js`
@@ -970,15 +829,10 @@ Flagging is like *marking/selecting* your message. There are two existing **flag
 ```javascript
 // 1st argument is the message (myMessages is just an array containing message objects literal)
 // 2nd argument is the flag you want to add. Possible values are 'flagged' and 'unread'. Default is 'flagged'.
-myCloud.Mail.flag([
+const flagChangeset = await myCloud.Mail.flag([
   myMessages[0],
   myMessages[1]
-], "flagged", function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result of flagging
-  console.log(result);
-});
+], "flagged");
 ```
 
 **Demo:** `demo/mail/flagMessages.js`
@@ -988,15 +842,10 @@ myCloud.Mail.flag([
 ```javascript
 // 1st argument is the message (myMessages is just an array containing message objects literal)
 // 2nd argument is the flag you want to remove. Possible values are 'flagged' and 'unread'. Default is 'flagged'.
-myCloud.Mail.unflag([
+const unflagChangeset = await myCloud.Mail.unflag([
   myMessages[0],
   myMessages[1]
-], "unread", function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result of flagging
-  console.log(result);
-});
+], "unread");
 ```
 
 Please keep in mind that `unread` means really unread. That means to flag your message as **read** you have to **unflag** the `unread` flag.
@@ -1009,7 +858,7 @@ Please keep in mind that `unread` means really unread. That means to flag your m
 To send a mail, you should remember that if you do not use a `from` property, this method will try to get your iClouds mail address using a second API. If you didn't performed a `__preference()` method before (which will mostly be the case), the `send()` method will do this to get your iCloud's mail address. Of course only if you did not give it as property (`from`). And of course, such a second API call in background will take more time.
 
 ```javascript
-myCloud.Mail.send({
+const sentment = await myCloud.Mail.send({
   //from: "Your Name<your.address@icloud.com>", If not given, your address will be found automatically
   to: "conr.maur@googlemail.com", // Required
   subject: "Your API",
@@ -1019,11 +868,6 @@ myCloud.Mail.send({
     // Not implemented yet
     // Coming soon
   ]
-}, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result of your sent mail
-  console.log(result);
 });
 ```
 
@@ -1032,14 +876,9 @@ myCloud.Mail.send({
 #### Create Folder
 
 ```javascript
-myCloud.Mail.createFolder({
+const createChangeset = await myCloud.Mail.createFolder({
   name: "My new Folder", // Default null
   parent: null // Can be a folder object or a guid string (Default null)
-}, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The new folder
-  console.log(result);
 });
 ```
 
@@ -1055,12 +894,7 @@ You are only allowed to move your own folders with the `role` `FOLDER`;-)
 ```javascript
 // 'myFolder' is just a folder object
 // 'myTargetFolder' is also just a folder object
-myCloud.Mail.moveFolder(myFolder, myTargetFolder, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result of your movement
-  console.log(result);
-});
+const moveChangeset = await myCloud.Mail.moveFolder(myFolder, myTargetFolder);
 ```
 
 **Demo:** `demo/mail/moveFolder.js`
@@ -1074,12 +908,7 @@ You are only allowed to rename your own folders with the `role` `FOLDER`;-)
 
 ```javascript
 // 'myFolder' is just a folder object
-myCloud.Mail.renameFolder(myFolder, "New Name", function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result of your renaming
-  console.log(result);
-});
+const renameChangeset = await myCloud.Mail.renameFolder(myFolder, "New Name");
 ```
 
 **Demo:** `demo/mail/renameFolder.js`
@@ -1090,12 +919,7 @@ Sadly there exist a bug within the web application of iCloud. If you rename a fo
 
 ```javascript
 // 'myFolder' is just a folder object
-myCloud.Mail.deleteFolder(myFolder, function(err, result) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // The result of your deletion
-  console.log(result);
-});
+const delChangeset = await myCloud.Mail.deleteFolder(myFolder);
 ```
 
 **Demo:** `demo/mail/deleteFolder.js`
@@ -1120,11 +944,8 @@ If the `getAll()` method is finished totally, the result is sorted by folders.
 
 ```javascript
 // Get all notes
-myCloud.Notes.getAll(function(err, folders) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Your folders containing the notes
-  console.log(folders);
+myCloud.Notes.getAll().then(function(result) {
+  console.log(result);
 });
 
 // Please keep in mind that records coming from "progress" event are not simplified by the API and you have to use them as they are
