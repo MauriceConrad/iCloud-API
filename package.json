@@ -33,6 +33,6 @@
 	"dependencies": {
 		"cookie": "^0.3.1",
 		"prompt": "^1.0.0",
-		"request": "^2.83.0"
+		"request": "^2.88.0"
 	}
 }

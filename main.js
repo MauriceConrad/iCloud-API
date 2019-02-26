@@ -330,7 +330,7 @@ class iCloud extends EventEmitter {
   saveSession(file = this.sessionFile) {
     // If file argument is not given, try to use the source the session was read from (Only possible if given)
     if (file) {
-      fs.writeFile(file, JSON.stringify(this.exportSession(), null, 2), function(err) {
+      fs.writeFile(file, JSON.stringify(this.exportSession(), null, 2), (err) => {
         if (err) return this.emit("error", err);
       });
     }
