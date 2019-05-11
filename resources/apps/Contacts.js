@@ -59,7 +59,10 @@ module.exports = {
           return callback(err);
         }
         var result = JSON.parse(body);
-        if ("errorCode" in result) return callback(result);
+        if ("errorCode" in result) {
+          reject(err);
+          return callback(err);
+        }
         self.Contacts.syncToken = result.syncToken;
         self.Contacts.prefToken = result.prefToken;
 
