@@ -45,8 +45,19 @@ module.exports = {
         reject(errorObj);
         return callback(errorObj);
       }
+
       var host = getHostFromWebservice(self.account.webservices.contacts);
-      request.post("https://" + host + "/co/contacts/card/?clientBuildNumber=" + self.clientSettings.clientBuildNumber + "&clientId=" + self.clientId + "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber + "&clientVersion=2.1&dsid=" + self.account.dsInfo.dsid + "&method=" + method + "&prefToken=" + self.Contacts.prefToken + "&syncToken=" + self.Contacts.syncToken, {
+        request.post("https://" + host + "/co/contacts/card/" +
+            "?clientBuildNumber=" + self.clientSettings.clientBuildNumber +
+            "&clientId=" + self.clientId +
+            "&clientMasteringNumber=" + self.clientSettings.clientMasteringNumber +
+            "&clientVersion=2.1" +
+            "&dsid=" + self.account.dsInfo.dsid +
+            "&locale=en_US" +
+            "&method=" + method +
+            "&order=first%2Clast" +
+            "&prefToken=" + self.Contacts.prefToken +
+            "&syncToken=" + self.Contacts.syncToken, {
         headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
@@ -59,13 +70,14 @@ module.exports = {
           return callback(err);
         }
         var result = JSON.parse(body);
+            
         if ("errorCode" in result) {
-          reject(err);
-          return callback(err);
+          reject(body);
+          return callback(body);
         }
+            
         self.Contacts.syncToken = result.syncToken;
         self.Contacts.prefToken = result.prefToken;
-
 
         resolve(result);
         callback(null, result);
