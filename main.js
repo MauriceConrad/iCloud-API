@@ -294,7 +294,7 @@ class iCloud extends EventEmitter {
           error: "Push token is expired. Getting new one...",
           errorCode: 22
         });
-        return self.Setup.getPushToken(self.push.topics, self.push.ttl, self.account.dsInfo.dsid, cookiesToStr(self.auth.cookies), self.clientId, function(err, token, url, cookies) {
+        return self.Setup.getPushToken(self, cookiesToStr(self.auth.cookies), function(err, token, url, cookies) {
           if (err) return callback(err);
           // Got push token.
           self.push.token = token;
