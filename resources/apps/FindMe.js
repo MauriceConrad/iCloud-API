@@ -234,6 +234,57 @@ module.exports = {
 
       });
     });
+  },
+  refreshClient(callback = function() {}) {
+    const self = this;
+
+    const content = JSON.stringify(self.FindMe.__generateContent());
+    var host = getHostFromWebservice(this.account.webservices.findme);
+
+    return new Promise(function(resolve, reject) {
+      request.post("https://" + host + "/fmipservice/client/web/refreshClient?" + paramStr({
+        "clientBuildNumber": self.clientSettings.clientBuildNumber,
+        "clientId": self.clientId,
+        "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
+        "dsid": self.account.dsInfo.dsid,
+      }), {
+        headers: fillDefaults({
+          'Referer': 'https://www.icloud.com/',
+          'Accept': '*/*',
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/603.3.1 (KHTML, like Gecko) Version/10.1.2 Safari/603.3.1',
+          'Origin': 'https://www.icloud.com',
+          'Cookie': cookiesToStr(self.auth.cookies),
+          'Host': host,
+          // 'X-APPLE-WEBAUTH-TOKEN': '',
+          // 'X-Apple-Widget-Key': self.clientSettings.xAppleWidgetKey,
+          // 'X-Apple-I-FD-Client-Info': JSON.stringify(self.clientSettings.xAppleIFDClientInfo),
+          // 'X-Apple-ID-Session-Id': self.clientSettings.xAppleIDSessionId,
+          // 'scnt': self.clientSettings.scnt
+        }, self.clientSettings.defaultHeaders),
+        body: content
+      }, function(err, response, body) {
+        if (err) return callback(err);
+        try {
+          // Try to parse the result as JSON (Sometimes it fails because the cookies are invalid)
+          var result = JSON.parse(body);
+        } catch (e) {
+          reject({
+            error: "Request body is no valid JSON",
+            errorCode: 13,
+            requestBody: body
+          });
+          return callback({
+            error: "Request body is no valid JSON",
+            errorCode: 13,
+            requestBody: body
+          });
+        }
+        if (result) {
+          callback(null, result);
+          resolve(result);
+        }
+      });
+    });
 
   }
 }
