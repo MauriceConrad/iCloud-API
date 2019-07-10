@@ -150,7 +150,7 @@ module.exports = {
 
     var host = getHostFromWebservice(self.account.webservices.findme);
     // Define request body for post with own properties
-    var content = JSON.stringify(self.__generateContent());
+    var content = JSON.stringify(self.FindMe.__generateContent());
 
     // Post the request
     request.post("https://" + host + "/fmipservice/client/web/initClient?" + paramStr({
