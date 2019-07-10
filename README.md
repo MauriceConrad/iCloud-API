@@ -242,7 +242,7 @@ This is the basic iCloud API that you can use to interact with iCloud services.
 This method lists your account contacts data like groups and persons.
 
 ```javascript
-myCloud.Calendar.list(function(err, data) {
+myCloud.Contacts.list(function(err, data) {
   if (err) return console.error(err);
   // Successfully your contacts :)
   console.log(data);

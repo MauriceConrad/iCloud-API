@@ -11,6 +11,8 @@ class iCloud extends EventEmitter {
     var self = this;
     // LoggedIn is false because we can't be sure that the session is valid
     self.loggedIn = false;
+    // enable push initially
+    self.enablePush = true;
     // If the session argument is a string, it will be interpreted as a file path and the file will be read
     if (typeof session === "string") {
       // Set instances's sessionFile key to use it later as path
@@ -271,7 +273,13 @@ class iCloud extends EventEmitter {
       callback(null, result);
     });
   }
-  initPush(callback = function() {}) {
+  initPush(callback = function () { }) {
+    // breaks the callback loop if we decide to disable push
+    if (!this.enablePush) {
+      this.enablePush = true;
+      return;
+    }
+
     var self = this;
     self.Setup.registerTopics(self, function(err, result) {
       if (err) return console.error(err);
@@ -294,7 +302,7 @@ class iCloud extends EventEmitter {
           error: "Push token is expired. Getting new one...",
           errorCode: 22
         });
-        return self.Setup.getPushToken(self.push.topics, self.push.ttl, self.account.dsInfo.dsid, cookiesToStr(self.auth.cookies), self.clientId, function(err, token, url, cookies) {
+        return self.Setup.getPushToken(self, cookiesToStr(self.auth.cookies), function(err, token, url, cookies) {
           if (err) return callback(err);
           // Got push token.
           self.push.token = token;
@@ -312,6 +320,11 @@ class iCloud extends EventEmitter {
       self.initPush(callback);
     });
   }
+
+  deactivatePush() {
+    this.enablePush = false;
+  }
+
   exportSession() {
     // Export session as object
     return {
