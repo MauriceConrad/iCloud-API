@@ -203,11 +203,11 @@ module.exports = {
         "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
         "dsid": self.account.dsInfo.dsid,
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           //'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) return callback(err);
