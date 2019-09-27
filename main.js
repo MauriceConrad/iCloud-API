@@ -118,7 +118,14 @@ class iCloud extends EventEmitter {
       self.cookiesValid = (function() {
         const timestamp = new Date().getTime();
         // Get list of cookies, represented to a boolean value wether the cookie is expired or no
-        const cookiesExpired = self.auth.cookies.map(cookie => new Date(cookie.Expires).getTime() - timestamp < 0);
+        // ignore cookie wich is expiring in 1970 --> so no extra code auth, when starting app
+        const cookiesExpired = self.auth.cookies.map(function (cookie) {
+          if ('X-APPLE-WEBAUTH-HSA-LOGIN' in cookie && 'Expires' in cookie) {
+            return false;
+          } else {
+            return new Date(cookie.Expires).getTime() - timestamp < 0;
+          }
+        });
         // If no cookie is expired, the array contains just 'false' keys
         // Return wether there is no expired cookie (true)
         return cookiesExpired.indexOf(true) === -1;
