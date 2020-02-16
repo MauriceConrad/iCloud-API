@@ -36,10 +36,7 @@ class iCloud extends EventEmitter {
     }
     else {
       // The given session argument is actually an object literal, therefore there is no file to be read. Continue :)
-      process.nextTick(() => {
-        sessionInit(session);
-      });
-
+      sessionInit(session);
     }
 
     var currTopics = self.Setup.getPushTopics(self.apps);
