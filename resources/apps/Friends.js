@@ -98,6 +98,8 @@ module.exports = {
                 contact: result.contactDetails[result.contactDetails.indexOfKey(pos.id, "id")] || null
               },
               address: pos.location.address,
+              accuracy: pos.location.horizontalAccuracy,
+              timestamp: pos.location.timestamp,
               longitude: pos.location.longitude,
               latitude: pos.location.latitude
             };

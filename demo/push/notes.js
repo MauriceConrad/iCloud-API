@@ -10,6 +10,9 @@ const promptiCloud = require("../prompt-credentials");
   myCloud.on("push", function(notification) {
     console.log("New push notification!");
     console.log(notification);
+
+    // demonstrate deactivating push after one notification
+    myCloud.deactivatePush();
   });
 
 })();

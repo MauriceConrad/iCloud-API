@@ -150,7 +150,7 @@ module.exports = {
 
     var host = getHostFromWebservice(self.account.webservices.findme);
     // Define request body for post with own properties
-    var content = JSON.stringify(self.__generateContent());
+    var content = JSON.stringify(self.FindMe.__generateContent());
 
     // Post the request
     request.post("https://" + host + "/fmipservice/client/web/initClient?" + paramStr({
@@ -203,11 +203,11 @@ module.exports = {
         "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
         "dsid": self.account.dsInfo.dsid,
       }), {
-        headers: {
+        headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
           //'Content-Length': content.length
-        }.fillDefaults(self.clientSettings.defaultHeaders),
+        }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
         if (err) return callback(err);

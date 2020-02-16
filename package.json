@@ -1,6 +1,6 @@
 {
 	"name": "apple-icloud",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "iCloud API",
 	"keywords": [
 		"icloud",
@@ -33,6 +33,6 @@
 	"dependencies": {
 		"cookie": "^0.3.1",
 		"prompt": "^1.0.0",
-		"request": "^2.83.0"
+		"request": "^2.88.0"
 	}
 }
