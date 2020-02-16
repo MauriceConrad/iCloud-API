@@ -1,0 +1,226 @@
+
+syntax = "proto2";
+
+package topotext;
+
+option optimize_for = LITE_RUNTIME;
+
+message String {
+  optional string string = 2;
+
+  // Only needed for mergeable strings.
+  repeated Substring substring = 3;
+  optional VectorTimestamp timestamp = 4;
+
+  repeated AttributeRun attributeRun = 5;
+
+  // Optional attachment data.
+  repeated Attachment attachment = 6;
+}
+
+message VectorTimestamp {
+  message Clock {
+    optional bytes replicaUUID = 1;
+    message ReplicaClock {
+      optional uint32 clock = 1;
+      optional uint32 subclock = 2;
+    }
+    repeated ReplicaClock replicaClock = 2;
+  }
+  repeated Clock clock = 1;
+}
+
+message CharID {
+  optional uint32 replicaID = 1;
+  optional uint32 clock = 2;
+}
+
+message Substring {
+  optional CharID charID = 1;
+  // Length of substring in UTF-16 characters (surrogate pairs are separate characters).
+  optional uint32 length = 2;
+
+  // Style timestamp.
+  optional CharID timestamp = 3;
+
+  optional bool tombstone = 4;
+
+  // Index into String.substring.
+  repeated uint32 child = 5;
+}
+
+message Selection {
+  message Range {
+    optional CharID fromChar = 1;
+    optional CharID toChar = 2;
+  };
+  repeated bytes replicaUUID = 1;
+  repeated Range range = 2;
+
+  enum Affinity {
+    Backward = 0;
+    Forward = 1;
+  }
+  optional Affinity affinity = 3;
+}
+
+message AttributeRun {
+  // Length of run in UTF-16 characters (surrogate pairs are separate characters).
+  optional uint32 length = 1;
+
+  optional ParagraphStyle paragraphStyle = 2;
+
+  // Overrides bold, italic and paragraph styles.
+  optional Font font = 3;
+
+  // Modifiers applied on-top of paragraph style.
+  // Bold, italic...
+  optional uint32 fontHints = 5;
+
+  // Integer values for future compatibility.
+  // Only set as 1 or 0 currently.
+  optional uint32 underline = 6;
+  optional uint32 strikethrough = 7;
+
+  optional int32 superscript = 8;
+  optional string link = 9;
+  optional Color color = 10;
+
+  enum WritingDirection {
+    NaturalDirection = 0;
+    LeftToRight = 1;
+    RightToLeft = 2;
+    LeftToRightOverride = 3;
+    RightToLeftOverride = 4;
+  }
+
+  optional WritingDirection writingDirection = 11;
+
+  optional AttachmentInfo attachmentInfo = 12;
+
+  // Not used, for future compatibility.
+  optional uint64 timestamp = 13;
+}
+
+message Font {
+  optional string name = 1;
+  optional float pointSize = 2;
+
+  // Hints for when named font does not exist on device.
+  optional uint32 fontHints = 3;
+}
+
+message ParagraphStyle {
+  enum Alignment {
+    Left = 0;
+    Center = 1;
+    Right = 2;
+    Justified = 3;
+    Natural = 4;
+  }
+
+  optional uint32 style = 1;
+  optional Alignment alignment = 2;
+  optional AttributeRun.WritingDirection writingDirection = 3;
+  optional int32 indent = 4;
+  optional Todo todo = 5;
+
+  // Hints for when paragraph style does not exist in this version.
+  optional uint32 paragraphHints = 6;
+
+  // Only used for the initial item of a numbered list.
+  optional uint32 startingListItemNumber = 7;
+}
+
+message AttachmentInfo {
+  optional string attachmentIdentifier = 1;
+  optional string typeUTI = 2;
+}
+
+message Attachment {
+  optional string identifier = 2;
+  optional bytes mergeableData = 3;
+  optional float sizeHeight = 4;
+  optional float sizeWidth = 5;
+  optional string summary = 6;
+  optional string title = 7;
+  optional string typeUTI = 8;
+  optional string urlString = 9;
+
+  optional Location location = 10;
+  optional Media media = 11;
+  repeated PreviewImage preview = 12;
+
+  optional float originX = 13;
+  optional float originY = 14;
+  optional int32 orientation = 15;
+
+  optional double previewUpdateDate = 16;
+  optional double modificationDate = 17;
+  optional string remoteFileURL = 18;
+  optional bool checkedForLocation = 19;
+  optional int64 fileSize = 20;
+  optional double duration = 21;
+
+  optional int32 imageFilterType = 22;
+  optional bytes markupModelData = 23;
+  repeated Attachment subAttachment = 24;
+
+  optional int64 minimumSupportedNotesVersion = 25;
+
+  optional double croppingQuadBottomLeftX = 26;
+  optional double croppingQuadBottomLeftY = 27;
+  optional double croppingQuadBottomRightX = 28;
+  optional double croppingQuadBottomRightY = 29;
+  optional double croppingQuadTopLeftX = 30;
+  optional double croppingQuadTopLeftY = 31;
+  optional double croppingQuadTopRightX = 32;
+  optional double croppingQuadTopRightY = 33;
+
+  optional bytes metadataData = 34;
+
+  optional string userTitle = 35;
+
+  optional bytes fallbackImageData = 36;
+}
+
+message Location {
+  optional double latitude = 1;
+  optional double longitude = 2;
+
+  optional bytes placemark = 3;
+
+  optional bool placeUpdated = 4;
+}
+
+message Media {
+  optional string identifier = 1;
+  optional string filenameExtension = 2;
+  optional bytes data = 3;
+  optional string filename = 4;
+
+  optional int64 minimumSupportedNotesVersion = 5;
+}
+
+message PreviewImage {
+  optional float scale = 1;
+  optional bool scaleWhenDrawing = 2;
+  optional bytes data = 3;
+  optional bytes metadata = 4;
+  optional int32 version = 5;
+  optional bool versionOutOfDate = 6;
+
+  optional int64 minimumSupportedNotesVersion = 7;
+}
+
+message Todo {
+  optional bytes todoUUID = 1;
+  optional bool done = 2;
+}
+
+message Color {
+  optional float red = 1;
+  optional float green = 2;
+  optional float blue = 3;
+  optional float alpha = 4;
+}

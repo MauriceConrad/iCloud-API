@@ -1,0 +1,22 @@
+
+syntax = "proto2";
+
+package versioned_document;
+
+option optimize_for = LITE_RUNTIME;
+
+message Document {
+  // Just in case.
+  optional uint32 serializationVersion = 1;
+
+  repeated Version version = 2;
+}
+
+message Version {
+  optional uint32 serializationVersion = 1;
+  optional uint32 minimumSupportedVersion = 2;
+
+  // Interpreted as a topotext.String
+  // Archived as bytes to ensure bit-perfect backward compatibility.
+  optional bytes data = 3;
+}

@@ -931,50 +931,60 @@ Sadly there exist a bug within the web application of iCloud. If you delete a fo
 
 #### Attention
 
-The database of your notes can be very large. And therefore the internal API of Apple uses `records`. A normal iCloud client requests for a *zone* (There is only one zone called *Notes*) and gets just a few notes. Now, if the user scrolls down, more records will be requested. On the one hand, this API is very smart but on the other hand, it's very slow. Therefore I implemented the method  `getAll()` which really gets **all** your notes but also takes a lot of time and requests if you have a lot of notes.
-That are the bad news.
-But the good news are, that a `progress` event fires and returns the current loaded `records`. A `record` can be a `Note` or a `Folder`. The only **problem** is that you may have a Note *record* but the associated *Folder* is not loaded yet. Only if `getAll()` really finishes, you can be completely sure that the folder a Note is associated with, is described in a `record` you also got.
+The database of your notes can be very large. And therefore the internal API of Apple uses `records`. A normal iCloud client requests for a *zone* (There is only one zone called *Notes*) and gets just a few notes. Now, if the user scrolls down, more records will be requested. That is the way how Apple's API works.
 
-This is not perfect, I know. But that is the way how Apple's API works and I can not change this generally.
-I just can recommend to use the method `getFolder()` because if you got a *Note* `record` but not the `record` of the related *Folder*, you may have a problem. This offers you the possibility to get the folder's data **before** the folder is returned a record.
+To make this process more dynamic, use the `fetch()` method which gets all notes as records asynchrounsly.
 
-If the `getAll()` method is finished totally, the result is sorted by folders.
+**Note**: By default a Note record
 
-#### Get Notes
+#### Fetch Notes
+
+When using `fetch()` all `Note` records will be stored at the `__notes` key within your notes emitter (return of `get()`). If you want to know the parent folder of a note given in `__notes` while the related folder is unknown at the moment, you can use `getFolder()` instead of waiting until the related folder comes trough `get()`.
 
 ```javascript
 // Get all notes
-myCloud.Notes.getAll().then(function(result) {
-  console.log(result);
+const notes = myCloud.Notes.fetch();
+
+notes.on("data", zone => {
+  // Do not use zone by default, the notes are sorted into 'folders'
+
+  // 'folders' is an array containing all notes sorted by folders that are known at this point of time
+  // Because of the fact, that the folders are coming over a zone, it may takes some time
+  console.log(notes.folders);
+
+  // Just log the notes you already got
+  //console.log(notes.__notes);
 });
 
-// Please keep in mind that records coming from "progress" event are not simplified by the API and you have to use them as they are
-
-// There come your records from 'getAll()'
-// You may use them before 'getAll()' is finished
-myCloud.on("progress", function(event) {
-  // Relate to the 'getAll()' method
-  if (event.parentAction === "getAll") {
-    // The 'zone' object is not important. Important are the 'records' within it
-    // These records are new and may contain Notes or Folders
-    // What they are actually containing is described in their object structure
-    console.log(event.zone.records);
-    // Here you can have a look at every record's 'parent' property and when the parent folder isn't loaded as record, you can load it manually with 'getFolders()' because it accepts also 'recordName' as arguments
-  }
-});
+notes.on("end", () => {
+  // Now, you can be sure that EACH folder and EACH note are known
+  console.log(note.folders);
+})
 ```
 
-**Demo getting all:** `demo/notes/getAll.js`
+**Demo:** `demo/notes/fetch.js`
 
-**Demo getting all with progress:** `demo/notes/getAllProgress.js`
+#### Resolve Notes
+
+Because `fetch()` returns `Note` records just containing `TitleEncrypted` `SnippetEncrypted` fields, call `resolve()` to get the Note's full content and encode the base64 snippet and title automatically. As arguments pass `Note` records or their `recordName` instead.
+
+```javascript
+// Returns array of your notes detailed
+const notesDetailed = await myCloud.Notes.resolve(note1, note2); // note1 and note2 are Note record objects or 'recordName' strings
+
+console.log(notesDetailed);
+```
+
+
+**Demo:** `demo/notes/resolveNotes.js`
 
 #### Get Folders
 
-Get folder objects directly. This is important because a `getAll()` call can take a lot of time.
+Get folder objects directly. Use this method if you need a Note's parent folder until this folder is unknown at the moment.
 
 ```javascript
 // 'myFolder1' & 'myFolder2' can be folder objects but also a plain 'recordName' as string (Useful if you know a folder's 'recordName' from a 'Note' record but not it's whole object because it is a record you actually don't have)
-myCloud.Notes.getFolders([ // Can also be a single folder object or a single 'recordName' string if it's only one
+myCloud.Notes.getFolders([ // Can also be a single folder object or a single 'recordName' string
   myFolder1,
   myFolder2
 ], function(err, folders) {
@@ -986,27 +996,6 @@ myCloud.Notes.getFolders([ // Can also be a single folder object or a single 're
 ```
 
 **Demo:** `demo/notes/getFolders.js`
-
-#### Get Notes
-
-Because a `getAll()` call can take a lot of time and the note you want may comes very late, you can load a note directly if you already know the whole *Note* object or just it's *record name*.
-
-```javascript
-// 'myNote1' & 'myNote2' can be note objects but also a plain 'recordName' as string
-myCloud.Notes.getNotes([ // Can also be a single note object or a single 'recordName' string if it's only one
-  myNote1, // Note object or just a record name
-  myNote2 // Note object or just a record name
-], function(err, notes) {
-  // If an error occurs
-  if (err) return console.error(err);
-  // Array with your note's data
-  console.log(notes);
-});
-
-// This will return all requested notes directly
-```
-
-**Demo:** `demo/notes/getNotes.js`
 
 ## Push Services
 

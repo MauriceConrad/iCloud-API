@@ -1,0 +1,125 @@
+
+syntax = "proto2";
+
+package CRDT;
+
+option optimize_for = LITE_RUNTIME;
+
+message ObjectID {
+  oneof contents {
+    sint64 integerValue = 1;
+    uint64 unsignedIntegerValue = 2;
+    double doubleValue = 3;
+    string stringValue = 4;
+    bytes bytesValue = 5;
+    // Store objects as an index into ‘objects'
+    uint32 objectIndex = 6;
+  }
+}
+
+message Timestamp {
+  optional uint64 replicaIndex = 1;
+  optional int64 counter = 2;
+}
+
+message RegisterLatest {
+  optional Timestamp timestamp = 1;
+  optional ObjectID contents = 2;
+}
+
+message VectorTimestamp {
+  message Element {
+    optional uint64 replicaIndex = 1;
+    optional uint64 clock = 2;
+    optional uint64 subclock = 3;
+  }
+  repeated Element element = 1;
+}
+
+message Dictionary {
+  message Element {
+    optional ObjectID key = 1;
+    optional ObjectID value = 2;
+    optional VectorTimestamp timestamp = 3;
+    optional RegisterLatest index = 4;
+  }
+  repeated Element element = 1;
+}
+
+message Index {
+  message Element {
+    optional uint64 replicaIndex = 1;
+    optional int64 integer = 2;
+  }
+  repeated Element element = 1;
+}
+
+message OneOf {
+  message Element {
+    optional ObjectID value = 1;
+    optional Timestamp timestamp = 2;
+  }
+  repeated Element element = 1;
+}
+
+message StringArray {
+  optional topotext.String contents = 1;
+  repeated ArrayAttachment attachments = 2;
+  message ArrayAttachment {
+    optional uint64 attachmentIndex = 1;
+    optional bytes contents = 2;
+  }
+}
+
+message Array {
+  optional StringArray array = 1;
+  optional Dictionary dictionary = 2;
+}
+
+message OrderedSet {
+  optional Array array = 1;
+  optional Dictionary set = 2;
+}
+
+message Document {
+  // A list of all objects in the graph.
+  message CustomObject {
+    // object type as an identifier index
+    optional int32 type = 1;
+    // key as identifier index -> ObjectID
+    message MapEntry {
+      required int32 key = 1;
+      required ObjectID value = 2;
+    }
+    repeated MapEntry mapEntry = 3;
+  }
+  message DocObject {
+    oneof contents {
+      RegisterLatest registerLatest = 1;
+      RegisterLatest registerGreatest = 2;
+      RegisterLatest registerLeast = 3;
+      Dictionary set = 4;
+      Dictionary orderedSet = 5;
+      Dictionary dictionary = 6;
+      Timestamp timestamp = 7;
+      VectorTimestamp vectorTimestamp = 8;
+      Index index = 9;
+      topotext.String string = 10;
+      uint64 weakReference = 11;
+      OneOf oneof = 12;
+      CustomObject custom = 13;
+      StringArray stringArray = 14;
+      Array array = 15;
+      OrderedSet tsOrderedSet = 16;
+      // Note: tags 1-15 take less space
+    }
+  }
+
+  optional VectorTimestamp version = 1;
+  optional VectorTimestamp startVersion = 2;
+  repeated DocObject object = 3;
+  repeated string keyItem = 4;
+  repeated string typeItem = 5;
+  repeated bytes uuidItem = 6;
+  optional topotext.VectorTimestamp ttTimestamp = 7;
+}
