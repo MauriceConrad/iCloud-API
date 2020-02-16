@@ -19,6 +19,7 @@ module.exports = {
         }
         var result = JSON.parse(body);
 
+
         if ("set-cookie" in response.headers) {
           var cookies = parseCookieStr(response.headers["set-cookie"]);
           self.auth.cookies = fillCookies(self.auth.cookies, cookies);
@@ -206,12 +207,14 @@ module.exports = {
 
             var refMetaRecord = findMetaRecord(image.__recordName, result.records);
 
+            console.log(refMetaRecord);
+
             var meta = {
               __recordName: refMetaRecord.recordName,
               date: refMetaRecord.fields.assetDate.value,
               subtypeV2: "assetSubtypeV2" in refMetaRecord.fields ? refMetaRecord.fields.assetSubtypeV2.value : null,
               HDRType: "assetHDRType" in refMetaRecord.fields ? refMetaRecord.fields.assetHDRType.value : null,
-              timeZoneOffset: refMetaRecord.fields.timeZoneOffset.value,
+              timeZoneOffset: refMetaRecord.fields.timeZoneOffset ? refMetaRecord.fields.timeZoneOffset.value : null,
               duration: "duration" in refMetaRecord.fields ? refMetaRecord.fields.duration.value : 0,
               favorite: ("isFavorite" in refMetaRecord.fields ? refMetaRecord.fields.isFavorite.value : null) ? true : false,
               created: refMetaRecord.created.timestamp,

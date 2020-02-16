@@ -136,10 +136,13 @@ module.exports = {
 
 
       function listItem(drivewsid, callback, useCache = true) {
+
         if (drivewsid in self.Drive.folderCache && useCache) {
           callback(null, self.Drive.folderCache[drivewsid], false);
           return;
         }
+
+        //console.log(self.auth.cookies);
 
         var content = JSON.stringify([
           {
@@ -158,6 +161,9 @@ module.exports = {
         }, function(err, response, body) {
           if (err) return callback(err);
           var result = JSON.parse(body);
+
+          console.log(result);
+
           if (0 in result) {
             self.Drive.folderCache[result[0].drivewsid] = result[0];
             callback(null, result[0]);
