@@ -250,12 +250,10 @@ module.exports = {
       "emailUpdates": true
     };
 
-    if (typeof test === 'object' && test.constructor === Object) {
+    if (typeof options === 'object' && options.constructor === Object) {
       for (let [key, value] of Object.entries(data)) {
-        if (key === 'text' && options.hasOwnProperty(key) && typeof options[key] === 'string' || options[key] instanceof String) {
-          data[key] = value
-        } else if (options.hasOwnProperty(key) && typeof variable === 'boolean') {
-          data[key] = value
+        if (options.hasOwnProperty(key) && typeof options[key] === typeof value) {
+          data[key] = options[key]
         }
       }
     }
