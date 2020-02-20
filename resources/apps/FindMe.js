@@ -235,6 +235,74 @@ module.exports = {
       });
     });
 
+  },
+  lostDevice(device, options, callback = function() {}) {
+    const self = this;
+
+    const deviceId = typeof device == "object" ? device.id : device;
+
+    const data = {
+      "device": deviceId,
+      "lostModeEnabled": true,
+      "trackingEnabled": true,
+      "userText": true,
+      "text": "",
+      "emailUpdates": true
+    };
+
+    if (typeof test === 'object' && test.constructor === Object) {
+      for (let [key, value] of Object.entries(data)) {
+        if (key === 'text' && options.hasOwnProperty(key) && typeof options[key] === 'string' || options[key] instanceof String) {
+          data[key] = value
+        } else if (options.hasOwnProperty(key) && typeof variable === 'boolean') {
+          data[key] = value
+        }
+      }
+    }
+
+    const content = JSON.stringify(Object.assign(self.FindMe.__generateContent(), data));
+
+    var host = getHostFromWebservice(this.account.webservices.findme);
+
+    return new Promise(function(resolve, reject) {
+      request.post("https://" + host + "/fmipservice/client/web/lostDevice?" + paramStr({
+        "clientBuildNumber": self.clientSettings.clientBuildNumber,
+        "clientId": self.clientId,
+        "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
+        "dsid": self.account.dsInfo.dsid,
+      }), {
+        headers: fillDefaults({
+          'Host': host,
+          'Cookie': cookiesToStr(self.auth.cookies),
+          //'Content-Length': content.length
+        }, self.clientSettings.defaultHeaders),
+        body: content
+      }, function(err, response, body) {
+        if (err) return callback(err);
+
+        try {
+          // Try to parse the result as JSON (Sometimes it fails because the cookies are invalid)
+          var result = JSON.parse(body);
+        } catch (e) {
+          reject({
+            error: "Request body is no valid JSON",
+            errorCode: 13,
+            requestBody: body
+          });
+          return callback({
+            error: "Request body is no valid JSON",
+            errorCode: 13,
+            requestBody: body
+          });
+        }
+        if (result) {
+          callback(null, result);
+          resolve(result);
+        }
+
+      });
+    });
+
   }
 }
 
