@@ -2,9 +2,13 @@ const request = require('request');
 var {getHostFromWebservice, cookiesToStr, parseCookieStr, fillCookies, newId, indexOfKey, paramString, paramStr, timeArray, arrayTime, fillDefaults} = require("./../helper");
 
 
+
 module.exports = {
   getEvents(startDate, endDate, callback = function() {}) {
     var self = this;
+
+
+
     var host = getHostFromWebservice(self.account.webservices.calendar);
     var events = [];
     var eventsPromise = new Promise(function(resolve, reject) {
@@ -367,7 +371,9 @@ module.exports = {
         "Alarm": alarms,
         "ClientState": {
           "Collection": [
-
+            {
+              "guid": event.pGuid
+            }
           ],
           "fullState": false,
           "userTime": 1234567890,
@@ -376,7 +382,6 @@ module.exports = {
       };
       if (!content.Recurrence) delete content.Recurrence;
 
-      //return console.log(content);
 
       content = JSON.stringify(content);
 
@@ -384,21 +389,21 @@ module.exports = {
       startDate = startDate.getFullYear() + "-" + (startDate.getMonth() + 1) + "-" + startDate.getDate();
       var endDate = startDate;
 
-
-      request.post("https://" + host + "/ca/events/" + event.pGuid + "/" + event.guid + "/" + ((all && event.recurrence) ? "all" : "") + "?" + paramStr((function() {
+      var url = "https://" + host + "/ca/events/" + event.pGuid + "/" + event.guid + (event.recurrence ? (all? "/future" : "/this") : "") + "?" + paramStr((function() {
         var args = {
           "clientBuildNumber": self.clientSettings.clientBuildNumber,
           "clientId": self.clientId,
           "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
           "clientVersion": 5.1,
           "dsid": self.account.dsInfo.dsid,
+          "endDate": "2100-12-31",
+          "ifMatch": event.etag ? encodeURIComponent(event.etag) : null,
           "lang": self.clientSettings.language,
-          //"startDate": startDate,
-          //"endDate": endDate,
-          "usertz": self.clientSettings.timezone,
           "methodOverride": methodOverride,
-          "ifMatch": event.etag ? encodeURIComponent(event.etag) : null
-        }
+          "startDate": "1900-01-01",
+          "usertz": self.clientSettings.timezone
+        };
+
         if (!args["methodOverride"]) {
           delete args["methodOverride"];
         }
@@ -406,7 +411,9 @@ module.exports = {
           delete args["ifMatch"];
         }
         return args;
-      })()), {
+      })());
+
+      request.post(url, {
         headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
@@ -414,13 +421,22 @@ module.exports = {
         }, self.clientSettings.defaultHeaders),
         body: content
       }, function(err, response, body) {
+
         if (err) {
           reject(err);
           return callback(err);
         }
-        var result = JSON.parse(body);
-        resolve(result);
-        callback(null, result);
+        try {
+          var result = JSON.parse(body);
+          resolve(result);
+          callback(null, result);
+        }
+        catch (err) {
+          reject({
+            err: err,
+            body: body
+          });
+        }
       });
     });
 

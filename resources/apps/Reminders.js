@@ -80,22 +80,14 @@ module.exports = {
         "Reminders": task,
         "ClientState": {
           "Collections": [
-
+            {
+              "guid": task.pGuid
+            }
           ]
         }
       });
 
-      request.post("https://" + host + "/rd/reminders/tasks?" + paramStr({
-        "clientBuildNumber": self.clientSettings.clientBuildNumber,
-        "clientId": self.clientId,
-        "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
-        "clientVersion": 5.1,
-        "dsid": self.account.dsInfo.dsid,
-        "lang": self.clientSettings.language,
-        "usertz": self.clientSettings.timezone,
-        "methodOverride": methodOverride || "POST",
-        "ifMatch": task.etag ? encodeURIComponent(task.etag) : ""
-      }), {
+      request.post("https://p67-remindersws.icloud.com/rd/reminders/tasks?clientBuildNumber=2003Project34&clientId=b0d019e2-3eca-4e1c-b5a8-907bf9b01721&clientMasteringNumber=2003B27&clientVersion=4.0&dsid=181764936&lang=de-de&usertz=Europe%2FRome", {
         headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
