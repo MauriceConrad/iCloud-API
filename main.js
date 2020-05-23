@@ -112,7 +112,7 @@ class iCloud extends EventEmitter {
       // Now, validate the session with checking for important aspects that show that the session can be used to get data (e.g. there need to be a token, some cookies and account info)
       self.loggedIn = (function() {
         //console.log(self.auth.cookies.length > 0, !!self.auth.token, self.account != {}, self.username === username);
-        return (self.auth.cookies.length > 0 && self.auth.token && self.account != {} && username ? (self.username === username) : true);
+        return ((self.auth.cookies.length > 0) && (self.auth.token && self.account != {}) && (username ? (self.username === username) : true));
       })();
 
 
