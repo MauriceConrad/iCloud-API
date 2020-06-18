@@ -26,57 +26,7 @@ module.exports = {
 
     return devicesPromise;
   },
-  __start(callback) {
-    var self = this;
 
-    var host = getHostFromWebservice(self.account.webservices.findme);
-
-    // Define post body
-
-    var content = JSON.stringify({
-      "clientContext": {
-        "appName": "iCloud Find (Web)",
-        "appVersion": "2.0",
-        "timezone": "Europe/Rome",
-        "inactiveTime": 1905,
-        "apiVersion": "3.0",
-        "deviceListVersion": 1,
-        "fmly": true
-      }
-    });
-
-    // Post the start up request
-
-    request.post("https://" + host + "/fmipservice/client/web/initClient?" + paramStr({
-      "clientBuildNumber": self.clientSettings.clientBuildNumber,
-      "clientId": self.clientId,
-      "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
-      "dsid": self.account.dsInfo.dsid,
-    }), {
-      headers: fillDefaults({
-        'Host': host,
-        'Cookie': cookiesToStr(self.auth.cookies),
-        'Content-Length': content.length
-      }, self.clientSettings.defaultHeaders),
-      body: content
-    }, function(err, response, body) {
-      if (err) return callback(err);
-      try {
-        // Try to parse the result as JSON (Sometimes it fails because the cookies invalid)
-        var result = JSON.parse(body);
-      } catch (e) {
-        return callback(e);
-      }
-      // Parse new cookies from response headers
-      var cookies = parseCookieStr(response.headers["set-cookie"]);
-      // Update cookies of current session
-      self.auth.cookies = fillCookies(self.auth.cookies, cookies);
-      // Fire session update event
-      self.emit("sessionUpdate");
-      // Return the result
-      callback(null, result);
-    });
-  },
   __saveGet(username, password, callback = function() {}) {
     var self = this;
 
@@ -85,20 +35,23 @@ module.exports = {
     }
     else {
       // Try to load start up data. Start up data is not different to the normal data but it's an "initialization" iCloud.com does and so, we also do it
-      self.FindMe.__start(function(err, result) {
+      self.FindMe.__data(function(err, result) {
         // Doesn't worked. Mostly we need new cookies
         if (err) {
           // Login
-          self.login(username, password, function(err) {
+          self.Setup.accountLogin(self, function(err, result, response) {
             if (err) return callback(err);
+            
+            var cookies = parseCookieStr(response.headers["set-cookie"]);
+            self.auth.cookies = fillCookies(self.auth.cookies, cookies);
+            self.emit("sessionUpdate");
             // No error logging in. Let's call get() again.
-            self.FindMe.get(username, password, callback);
-          });
+            self.FindMe.__data(callback);
+          }, { "appName": "find", "apple_id": username, "password": password });
         }
         else {
           // Start up data was successfully requested. Now, initialized = true and the next data requests will use a differnet endpoint
           module.exports.initialized = true;
-          result = handleFindMeData(result);
           callback(null, result);
         }
       });
@@ -150,10 +103,22 @@ module.exports = {
 
     var host = getHostFromWebservice(self.account.webservices.findme);
     // Define request body for post with own properties
-    var content = JSON.stringify(self.FindMe.__generateContent());
+    var content = JSON.stringify({
+      "clientContext": {
+        "appName": "iCloud Find (Web)",
+        "appVersion": "2.0",
+        "timezone": self.clientSettings.timezone || "US/Pacific",
+        "inactiveTime": 10,
+        "apiVersion": "3.0",
+        "deviceListVersion": 1,
+        "fmly": true,
+        "shouldLocate": true,
+        "selectedDevice": "all"
+      }
+    });
 
     // Post the request
-    request.post("https://" + host + "/fmipservice/client/web/initClient?" + paramStr({
+    request.post("https://" + host + "/fmipservice/client/web/refreshClient?" + paramStr({
       "clientBuildNumber": self.clientSettings.clientBuildNumber,
       "clientId": self.clientId,
       "clientMasteringNumber": self.clientSettings.clientMasteringNumber,
@@ -178,6 +143,13 @@ module.exports = {
           requestBody: body
         });
       }
+      // Parse new cookies from response headers
+      var cookies = parseCookieStr(response.headers["set-cookie"]);
+      // Update cookies of current session
+      self.auth.cookies = fillCookies(self.auth.cookies, cookies);
+      // Fire session update event
+      self.emit("sessionUpdate");
+
       // Handle result
       result = handleFindMeData(result);
       // Return result
