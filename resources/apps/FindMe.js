@@ -13,6 +13,7 @@ module.exports = {
     var devicesPromise = new Promise(function(resolve, reject) {
       self.FindMe.__saveGet(username, password, function(err, result) {
         if (err) {
+          self.FindMe.initialized = false;
           reject({
             error: "Something went wrong. Maybe your credentials are incorrect.",
             code: 11
