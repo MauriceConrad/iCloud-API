@@ -67,8 +67,8 @@ class iCloud extends EventEmitter {
             };
           },
           timezone: "US/Pacific",
-          clientBuildNumber: "17DProject78",
-          clientMasteringNumber: "17D68",
+          clientBuildNumber: "2018Project35",
+          clientMasteringNumber: "2018B29",
           defaultHeaders: {
             'Referer': 'https://www.icloud.com/',
             'Content-Type': 'text/plain',

@@ -56,8 +56,8 @@ module.exports = {
             "&locale=en_US" +
             "&method=" + method +
             "&order=first%2Clast" +
-            "&prefToken=" + self.Contacts.prefToken +
-            "&syncToken=" + self.Contacts.syncToken, {
+            "&prefToken=" + encodeURIComponent(self.Contacts.prefToken) +
+            "&syncToken=" + encodeURIComponent(self.Contacts.syncToken), {
         headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
@@ -145,8 +145,8 @@ module.exports = {
             "&locale=en_US" +
             "&method=" + method +
             "&order=first%2Clast" +
-            "&prefToken=" + self.Contacts.prefToken +
-            "&syncToken=" + self.Contacts.syncToken, {
+            "&prefToken=" + encodeURIComponent(self.Contacts.prefToken) +
+            "&syncToken=" + encodeURIComponent(self.Contacts.syncToken), {
         headers: fillDefaults({
           'Host': host,
           'Cookie': cookiesToStr(self.auth.cookies),
