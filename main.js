@@ -157,6 +157,13 @@ class iCloud extends EventEmitter {
         self.login(self.username, self.password, function(err) {
           if (err) {
             // If an error ocurs, fire an 'error' event
+
+            // handle non-standard errors
+            if (err.errorCode) {
+                return self.emit("err", err)
+            }
+
+            // otherwise, generic handling
             return self.emit("err", {
               error: "Account is broken or password and username are invalid",
               errorCode: 7
