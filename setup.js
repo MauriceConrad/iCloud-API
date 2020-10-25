@@ -41,8 +41,9 @@
       }, function(err, response, body) {
         // If there are any request errors
         if (err) return callback(err);
+        var result;
         try {
-            const result = JSON.parse(body);
+            result = JSON.parse(body);
         } catch (err) {
             return callback({
                 error: "Failed to parse token.",
