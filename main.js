@@ -159,7 +159,7 @@ class iCloud extends EventEmitter {
             // If an error ocurs, fire an 'error' event
 
             // handle non-standard errors
-            if (err.errorCode) {
+            if (err.code) {
                 return self.emit("err", err)
             }
 
