@@ -41,7 +41,17 @@
       }, function(err, response, body) {
         // If there are any request errors
         if (err) return callback(err);
-        const result = JSON.parse(body);
+        var result;
+        try {
+            result = JSON.parse(body);
+        } catch (err) {
+            return callback({
+                error: "Failed to parse token.",
+                code: 0,
+                requestBody: body
+            })
+        }
+        
         // If the session token exists
         var sessionToken;
         if ("x-apple-session-token" in response.headers) {
