@@ -333,7 +333,7 @@ const itemInfo = await myCloud.Drive.getItem("FOLDER::com.apple.CloudDocs::root"
 
 #### Error?
 
-May you see the error **"No PCS cookies"**. This is because you logged in to ofetn and icloud servers does not send them to you anymore or your actual session just does not have any PCS cookies. In any case, wait a few seconds up to minutes and reset your session. And **please** store your sessions! This will avoid such problems!
+May you see the error **"No PCS cookies"**. This is because you logged in too often and icloud servers does not send them to you anymore or your actual session just does not have any PCS cookies. In any case, wait a few seconds up to minutes and reset your session. And **please** store your sessions! This will avoid such problems!
 
 If you do his, you will see that you become a list with root's sub items and the related *drivewsid*'s. Theoretically you can work so.
 
