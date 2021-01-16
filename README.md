@@ -36,7 +36,7 @@ myCloud.on("ready", function() {
 
 ### Session broken
 
-Basically, your instance always tries to use an existing session. You can pass a session by an object or a file path that points to a JSOn file. If the passed session is invalid because of any reason, your instance will use your given credentials to re-login. If you did not gave any credentials to the constructor, your instance will try to get the credentials from the given (and obviously broken) session that are normally stored within.
+Basically, your instance always tries to use an existing session. You can pass a session by an object or a file path that points to a JSON file. If the passed session is invalid because of any reason, your instance will use your given credentials to re-login. If you did not gave any credentials to the constructor, your instance will try to get the credentials from the given (and obviously broken) session that are normally stored within.
 
 ```javascript
 // This creates your iCloud instance
@@ -217,7 +217,7 @@ myCloud.sendSecurityCode("voice");
 Sometimes you run your script & give your credentials but no security code comes in?
 This mostly happens because you set up a session that is partial completed but not fully complete. Try to delete your existing session file and try it again.
 
-Also try to not wonder why you do not have to type in a security code a second time after using `test.js` or any other test envioreemnt. They save your session at `/tmp/icloud-session.json`. If you use it a second time, it just uses the old session.
+Also try to not wonder why you do not have to type in a security code a second time after using `test.js` or any other test environment. They save your session at `/tmp/icloud-session.json`. If you use it a second time, it just uses the old session.
 
 
 ## Applications
@@ -333,7 +333,7 @@ const itemInfo = await myCloud.Drive.getItem("FOLDER::com.apple.CloudDocs::root"
 
 #### Error?
 
-May you see the error **"No PCS cookies"**. This is because you logged in to ofetn and icloud servers does not send them to you anymore or your actual session just does not have any PCS cookies. In any case, wait a few seconds up to minutes and reset your session. And **please** store your sessions! This will avoid such problems!
+May you see the error **"No PCS cookies"**. This is because you logged in too often and icloud servers does not send them to you anymore or your actual session just does not have any PCS cookies. In any case, wait a few seconds up to minutes and reset your session. And **please** store your sessions! This will avoid such problems!
 
 If you do his, you will see that you become a list with root's sub items and the related *drivewsid*'s. Theoretically you can work so.
 
