@@ -24,7 +24,7 @@ const iCloud = require('apple-icloud');
 
 var session = {}; // An empty session. Has to be a session object or file path that points on a JSON file containing your session
 var username = "my.account@mail.com"; // Your apple id
-var password = "totally-save-password"; // Your password
+var password = "totally-safe-password"; // Your password
 
 // This creates your iCloud instance
 var myCloud = new iCloud(session, username, password);
@@ -583,7 +583,7 @@ This service is very good protected by Apple. As you know from iCloud.com you ha
 #### Get
 
 ```javascript
-const devices = await myCloud.FindMe.get("my.account@mail.com", "totally-save-password");
+const devices = await myCloud.FindMe.get("my.account@mail.com", "totally-safe-password");
 ```
 
 You do not have to give your credentials again, these arguments are optional. Normally they will be used from the session instantly. (Your session remembers your password if you do not delete it).
@@ -599,7 +599,7 @@ myCloud.FindMe.initialized = false;
 
 
 // A new call 'get()' will re-initialize everything
-const devices = await myCloud.FindMe.get("my.account@mail.com", "totally-save-password");
+const devices = await myCloud.FindMe.get("my.account@mail.com", "totally-safe-password");
 ```
 
 Sadly there are still problems with the API. Sometimes the cookies of the session are invalid in general and `get()` still does not not work.
